@@ -507,6 +507,75 @@ python cli/main_cli.py
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1500&pause=300&color=FD79A8&center=true&vCenter=true&repeat=true&width=800&height=50&lines=🎥+Click+to+Watch+Live+Demos;⚡+Real-time+Code+Generation;🎯+Production-Ready+Results;🧬+AI-Powered+Development" alt="Demo Features" />
 </div>
 
+### 🖥️ **Interface Showcase**
+
+<div align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=16&duration=2000&pause=600&color=00D4FF&center=true&vCenter=true&multiline=true&width=600&height=50&lines=🖥️+Choose+Your+Interface;🎨+CLI+or+Web+Experience" alt="Interface Header" />
+</div>
+
+<table align="center" width="100%" style="border: none; border-collapse: collapse; margin: 30px 0; table-layout: fixed;">
+<tr>
+<td width="50%" align="center" style="vertical-align: middle; padding: 20px; height: 100%;">
+
+<div style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+
+#### 🖥️ **CLI Interface**
+**Terminal-Based Development**
+
+<div align="center" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+  
+  <video width="100%" height="300" controls style="border-radius: 10px; box-shadow: 0 8px 20px rgba(45,55,72,0.3); margin: 15px 0; object-fit: cover;">
+    <source src="https://github.com/Zongwei9888/Experiment_Images/raw/d764f05fe7d528d87aca67366c63352de9345930/DeepCode_images/CLI.mp4" type="video/mp4">
+    <p>Your browser does not support the video tag. <a href="https://github.com/Zongwei9888/Experiment_Images/blob/d764f05fe7d528d87aca67366c63352de9345930/DeepCode_images/CLI.mp4">View CLI Demo</a></p>
+  </video>
+  
+  <div style="background: linear-gradient(135deg, #2D3748 0%, #4A5568 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white; min-height: 80px; display: flex; flex-direction: column; justify-content: center;">
+    <strong>🚀 Advanced Terminal Experience</strong><br/>
+    <small>⚡ Fast command-line workflow<br/>🔧 Developer-friendly interface<br/>📊 Real-time progress tracking</small>
+  </div>
+  
+  <div style="margin-top: 10px;">
+    <em>Professional terminal interface for advanced users and CI/CD integration</em>
+  </div>
+</div>
+
+</div>
+
+</td>
+<td width="50%" align="center" style="vertical-align: middle; padding: 20px; height: 100%;">
+
+<div style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+
+#### 🌐 **Web Interface**
+**Visual Interactive Experience**
+
+<div align="center" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+  
+  <video width="100%" height="300" controls style="border-radius: 10px; box-shadow: 0 8px 20px rgba(14,165,233,0.3); margin: 15px 0; object-fit: cover;">
+    <source src="https://github.com/Zongwei9888/Experiment_Images/raw/d764f05fe7d528d87aca67366c63352de9345930/DeepCode_images/UI.mp4" type="video/mp4">
+    <p>Your browser does not support the video tag. <a href="https://github.com/Zongwei9888/Experiment_Images/blob/d764f05fe7d528d87aca67366c63352de9345930/DeepCode_images/UI.mp4">View Web Demo</a></p>
+  </video>
+  
+  <div style="background: linear-gradient(135deg, #0EA5E9 0%, #00D4FF 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white; min-height: 80px; display: flex; flex-direction: column; justify-content: center;">
+    <strong>🎨 Modern Web Dashboard</strong><br/>
+    <small>🖱️ Intuitive drag-and-drop<br/>📱 Responsive design<br/>🎯 Visual progress tracking</small>
+  </div>
+  
+  <div style="margin-top: 10px;">
+    <em>Beautiful web interface with streamlined workflow for all skill levels</em>
+  </div>
+</div>
+
+</div>
+
+</td>
+</tr>
+</table>
+
+<div align="center" style="margin: 30px 0;">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1500&pause=300&color=00D4FF&center=true&vCenter=true&repeat=true&width=800&height=50&lines=🖥️+Choose+Your+Preferred+Interface;⚡+Both+Powered+by+Multi-Agent+AI;🎯+Same+Power%2C+Different+Experience;🚀+Start+Development+Your+Way" alt="Interface Features" />
+</div>
+
 ### 🚀 **Coming Soon**
 
 We're continuously enhancing DeepCode with exciting new features:
