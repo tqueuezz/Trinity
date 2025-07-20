@@ -30,6 +30,53 @@
   <img src="https://img.shields.io/badge/HKU-Data_Intelligence_Lab-f39c12?style=for-the-badge&logo=university&logoColor=white" alt="HKU">
 </p>
 
+### 🖥️ **Interface Showcase**
+
+<table align="center" width="100%" style="border: none; border-collapse: collapse; margin: 30px 0;">
+<tr>
+<td width="50%" align="center" style="vertical-align: top; padding: 20px;">
+
+#### 🖥️ **CLI Interface**
+**Terminal-Based Development**
+
+<div align="center">
+  
+  <img src="https://github.com/Zongwei9888/Experiment_Images/blob/8882a7313c504ca97ead6e7b36c51aa761b6a4f3/DeepCode_images/CLI.gif" alt="CLI Interface Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 20px rgba(45,55,72,0.3); margin: 15px 0;"/>
+  
+  <div style="background: linear-gradient(135deg, #2D3748 0%, #4A5568 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white;">
+    <strong>🚀 Advanced Terminal Experience</strong><br/>
+    <small>⚡ Fast command-line workflow<br/>🔧 Developer-friendly interface<br/>📊 Real-time progress tracking</small>
+  </div>
+  
+  *Professional terminal interface for advanced users and CI/CD integration*
+</div>
+
+</td>
+<td width="50%" align="center" style="vertical-align: top; padding: 20px;">
+
+#### 🌐 **Web Interface**
+**Visual Interactive Experience**
+
+<div align="center">
+  
+  <img src="https://github.com/Zongwei9888/Experiment_Images/raw/8882a7313c504ca97ead6e7b36c51aa761b6a4f3/DeepCode_images/UI.gif" alt="Web Interface Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 20px rgba(14,165,233,0.3); margin: 15px 0;"/>
+  
+  <div style="background: linear-gradient(135deg, #0EA5E9 0%, #00D4FF 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white;">
+    <strong>🎨 Modern Web Dashboard</strong><br/>
+    <small>🖱️ Intuitive drag-and-drop<br/>📱 Responsive design<br/>🎯 Visual progress tracking</small>
+  </div>
+  
+  *Beautiful web interface with streamlined workflow for all skill levels*
+</div>
+
+</td>
+</tr>
+</table>
+
+<div align="center" style="margin: 30px 0;">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1500&pause=300&color=00D4FF&center=true&vCenter=true&repeat=true&width=800&height=50&lines=🖥️+Choose+Your+Preferred+Interface;⚡+Both+Powered+by+Multi-Agent+AI;🎯+Same+Power%2C+Different+Experience;🚀+Start+Development+Your+Way" alt="Interface Features" />
+</div>
+
 <p align="center">
   <img src="deepcode-mcp/Deepcode.png" alt="DeepCode Banner" width="800" style="border-radius: 20px; box-shadow: 0 25px 60px rgba(0,212,255,0.4), 0 15px 35px rgba(0,212,255,0.3), 0 5px 15px rgba(0,0,0,0.1); transform: perspective(1000px) rotateX(2deg); filter: brightness(1.1) contrast(1.05);"/>
 </p>
@@ -505,57 +552,6 @@ python cli/main_cli.py
 
 <div align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1500&pause=300&color=FD79A8&center=true&vCenter=true&repeat=true&width=800&height=50&lines=🎥+Click+to+Watch+Live+Demos;⚡+Real-time+Code+Generation;🎯+Production-Ready+Results;🧬+AI-Powered+Development" alt="Demo Features" />
-</div>
-
-### 🖥️ **Interface Showcase**
-
-<div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=16&duration=2000&pause=600&color=00D4FF&center=true&vCenter=true&multiline=true&width=600&height=50&lines=🖥️+Choose+Your+Interface;🎨+CLI+or+Web+Experience" alt="Interface Header" />
-</div>
-
-<table align="center" width="100%" style="border: none; border-collapse: collapse; margin: 30px 0;">
-<tr>
-<td width="50%" align="center" style="vertical-align: top; padding: 20px;">
-
-#### 🖥️ **CLI Interface**
-**Terminal-Based Development**
-
-<div align="center">
-  
-  <img src="https://github.com/Zongwei9888/Experiment_Images/blob/8882a7313c504ca97ead6e7b36c51aa761b6a4f3/DeepCode_images/CLI.gif" alt="CLI Interface Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 20px rgba(45,55,72,0.3); margin: 15px 0;"/>
-  
-  <div style="background: linear-gradient(135deg, #2D3748 0%, #4A5568 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white;">
-    <strong>🚀 Advanced Terminal Experience</strong><br/>
-    <small>⚡ Fast command-line workflow<br/>🔧 Developer-friendly interface<br/>📊 Real-time progress tracking</small>
-  </div>
-  
-  *Professional terminal interface for advanced users and CI/CD integration*
-</div>
-
-</td>
-<td width="50%" align="center" style="vertical-align: top; padding: 20px;">
-
-#### 🌐 **Web Interface**
-**Visual Interactive Experience**
-
-<div align="center">
-  
-  <img src="https://github.com/Zongwei9888/Experiment_Images/raw/8882a7313c504ca97ead6e7b36c51aa761b6a4f3/DeepCode_images/UI.gif" alt="Web Interface Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 20px rgba(14,165,233,0.3); margin: 15px 0;"/>
-  
-  <div style="background: linear-gradient(135deg, #0EA5E9 0%, #00D4FF 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white;">
-    <strong>🎨 Modern Web Dashboard</strong><br/>
-    <small>🖱️ Intuitive drag-and-drop<br/>📱 Responsive design<br/>🎯 Visual progress tracking</small>
-  </div>
-  
-  *Beautiful web interface with streamlined workflow for all skill levels*
-</div>
-
-</td>
-</tr>
-</table>
-
-<div align="center" style="margin: 30px 0;">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=14&duration=1500&pause=300&color=00D4FF&center=true&vCenter=true&repeat=true&width=800&height=50&lines=🖥️+Choose+Your+Preferred+Interface;⚡+Both+Powered+by+Multi-Agent+AI;🎯+Same+Power%2C+Different+Experience;🚀+Start+Development+Your+Way" alt="Interface Features" />
 </div>
 
 ### 🚀 **Coming Soon**
