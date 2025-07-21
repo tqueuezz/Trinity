@@ -5,22 +5,17 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: requirements-txt-fixer
-        exclude: ^/ui/
 
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.4
     hooks:
       - id: ruff-format
-        exclude: ^/ui/
       - id: ruff
         args: [--fix, --ignore=E402]
-        exclude: ^/ui/
-
 
   - repo: https://github.com/mgedmin/check-manifest
     rev: "0.49"
     hooks:
       - id: check-manifest
         stages: [manual]
-        exclude: ^/ui/
