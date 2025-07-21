@@ -6,10 +6,11 @@ identifying file relationships and reusable components for implementation.
 
 Features:
 - Recursive file traversal
-- LLM-powered code similarity analysis
+- LLM-powered code similarity analysis using augmented LLM classes
 - JSON-based relationship storage
 - Configurable matching strategies
 - Progress tracking and error handling
+- Automatic LLM provider selection based on API key availability
 """
 
 import asyncio
@@ -21,6 +22,77 @@ from datetime import datetime
 from pathlib import Path
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Any
+
+# MCP Agent imports for LLM
+from mcp_agent.workflows.llm.augmented_llm_anthropic import AnthropicAugmentedLLM
+from mcp_agent.workflows.llm.augmented_llm_openai import OpenAIAugmentedLLM
+import yaml
+
+def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml"):
+    """
+    Automatically select the LLM class based on API key availability in configuration.
+
+    Reads from YAML config file and returns AnthropicAugmentedLLM if anthropic.api_key
+    is available, otherwise returns OpenAIAugmentedLLM.
+
+    Args:
+        config_path: Path to the YAML configuration file
+
+    Returns:
+        class: The preferred LLM class
+    """
+    try:
+        # Try to read the configuration file
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+
+            # Check for anthropic API key in config
+            anthropic_config = config.get("anthropic", {})
+            anthropic_key = anthropic_config.get("api_key", "")
+
+            if anthropic_key and anthropic_key.strip() and not anthropic_key == "":
+                return AnthropicAugmentedLLM
+            else:
+                return OpenAIAugmentedLLM
+        else:
+            print(f"🤖 Config file {config_path} not found, using OpenAIAugmentedLLM")
+            return OpenAIAugmentedLLM
+
+    except Exception as e:
+        print(f"🤖 Error reading config file {config_path}: {e}")
+        print("🤖 Falling back to OpenAIAugmentedLLM")
+        return OpenAIAugmentedLLM
+
+
+def get_default_models(config_path: str = "mcp_agent.config.yaml"):
+    """
+    Get default models from configuration file.
+
+    Args:
+        config_path: Path to the configuration file
+
+    Returns:
+        dict: Dictionary with 'anthropic' and 'openai' default models
+    """
+    try:
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+
+            anthropic_model = config.get("anthropic", {}).get(
+                "default_model", "claude-sonnet-4-20250514"
+            )
+            openai_model = config.get("openai", {}).get("default_model", "o3-mini")
+
+            return {"anthropic": anthropic_model, "openai": openai_model}
+        else:
+            print(f"Config file {config_path} not found, using default models")
+            return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
+
+    except Exception as e:
+        print(f"Error reading config file {config_path}: {e}")
+        return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
 
 
 @dataclass
@@ -78,6 +150,7 @@ class CodeIndexer:
         self.indexer_config_path = indexer_config_path
         self.api_config = self._load_api_config()
         self.indexer_config = self._load_indexer_config()
+        self.default_models = get_default_models("mcp_agent.config.yaml")
 
         # Use config paths if not provided as parameters
         paths_config = self.indexer_config.get("paths", {})
@@ -301,7 +374,7 @@ class CodeIndexer:
             return {}
 
     async def _initialize_llm_client(self):
-        """Initialize LLM client based on configured provider"""
+        """Initialize LLM client (Anthropic or OpenAI) based on API key availability"""
         if self.llm_client is not None:
             return self.llm_client, self.llm_client_type
 
@@ -312,89 +385,65 @@ class CodeIndexer:
             self.llm_client_type = "mock"
             return "mock", "mock"
 
-        # Try configured provider first
-        if self.model_provider.lower() == "anthropic":
+        # Check which API has available key and try that first
+        anthropic_key = self.api_config.get("anthropic", {}).get("api_key", "")
+        openai_key = self.api_config.get("openai", {}).get("api_key", "")
+
+        # Try Anthropic API first if key is available
+        if anthropic_key and anthropic_key.strip():
             try:
-                anthropic_key = self.api_config.get("anthropic", {}).get("api_key")
-                if anthropic_key:
-                    from anthropic import AsyncAnthropic
-
-                    client = AsyncAnthropic(api_key=anthropic_key)
-                    # Test connection
-                    await client.messages.create(
-                        model="claude-sonnet-4-20250514",
-                        max_tokens=10,
-                        messages=[{"role": "user", "content": "test"}],
-                    )
-                    self.logger.info("Using Anthropic API for code analysis")
-                    self.llm_client = client
-                    self.llm_client_type = "anthropic"
-                    return client, "anthropic"
-            except Exception as e:
-                self.logger.warning(f"Configured Anthropic API unavailable: {e}")
-
-        elif self.model_provider.lower() == "openai":
-            try:
-                openai_key = self.api_config.get("openai", {}).get("api_key")
-                if openai_key:
-                    from openai import AsyncOpenAI
-
-                    client = AsyncOpenAI(api_key=openai_key)
-                    # Test connection
-                    await client.chat.completions.create(
-                        model="gpt-3.5-turbo",
-                        max_tokens=10,
-                        messages=[{"role": "user", "content": "test"}],
-                    )
-                    self.logger.info("Using OpenAI API for code analysis")
-                    self.llm_client = client
-                    self.llm_client_type = "openai"
-                    return client, "openai"
-            except Exception as e:
-                self.logger.warning(f"Configured OpenAI API unavailable: {e}")
-
-        # Fallback: try other provider
-        self.logger.info("Trying fallback provider...")
-
-        # Try Anthropic as fallback
-        try:
-            anthropic_key = self.api_config.get("anthropic", {}).get("api_key")
-            if anthropic_key:
                 from anthropic import AsyncAnthropic
 
                 client = AsyncAnthropic(api_key=anthropic_key)
+                # Test connection with default model from config
                 await client.messages.create(
-                    model="claude-sonnet-4-20250514",
+                    model=self.default_models["anthropic"],
                     max_tokens=10,
                     messages=[{"role": "user", "content": "test"}],
                 )
-                self.logger.info("Using Anthropic API as fallback")
+                self.logger.info(
+                    f"Using Anthropic API with model: {self.default_models['anthropic']}"
+                )
                 self.llm_client = client
                 self.llm_client_type = "anthropic"
                 return client, "anthropic"
-        except Exception as e:
-            self.logger.warning(f"Anthropic fallback failed: {e}")
+            except Exception as e:
+                self.logger.warning(f"Anthropic API unavailable: {e}")
 
-        # Try OpenAI as fallback
-        try:
-            openai_key = self.api_config.get("openai", {}).get("api_key")
-            if openai_key:
+        # Try OpenAI API if Anthropic failed or key not available
+        if openai_key and openai_key.strip():
+            try:
                 from openai import AsyncOpenAI
 
-                client = AsyncOpenAI(api_key=openai_key)
+                # Handle custom base_url if specified
+                openai_config = self.api_config.get("openai", {})
+                base_url = openai_config.get("base_url")
+
+                if base_url:
+                    client = AsyncOpenAI(api_key=openai_key, base_url=base_url)
+                else:
+                    client = AsyncOpenAI(api_key=openai_key)
+
+                # Test connection with default model from config
                 await client.chat.completions.create(
-                    model="gpt-3.5-turbo",
+                    model=self.default_models["openai"],
                     max_tokens=10,
                     messages=[{"role": "user", "content": "test"}],
                 )
-                self.logger.info("Using OpenAI API as fallback")
+                self.logger.info(
+                    f"Using OpenAI API with model: {self.default_models['openai']}"
+                )
+                if base_url:
+                    self.logger.info(f"Using custom base URL: {base_url}")
                 self.llm_client = client
                 self.llm_client_type = "openai"
                 return client, "openai"
-        except Exception as e:
-            self.logger.warning(f"OpenAI fallback failed: {e}")
+            except Exception as e:
+                self.logger.warning(f"OpenAI API unavailable: {e}")
 
-        raise ValueError("No available LLM API for code analysis")
+        raise ValueError(
+            "No available LLM API - please check your API keys in configuration"
+        )
 
     async def _call_llm(
         self, prompt: str, system_prompt: str = None, max_tokens: int = None
@@ -426,7 +475,7 @@ class CodeIndexer:
 
                 if client_type == "anthropic":
                     response = await client.messages.create(
-                        model="claude-sonnet-4-20250514",
+                        model=self.default_models["anthropic"],
                         system=system_prompt,
                         messages=[{"role": "user", "content": prompt}],
                         max_tokens=max_tokens,
@@ -451,7 +500,7 @@ class CodeIndexer:
                     ]
 
                     response = await client.chat.completions.create(
-                        model="gpt-4-1106-preview",
+                        model=self.default_models["openai"],
                         messages=messages,
                         max_tokens=max_tokens,
                         temperature=self.llm_temperature,
@@ -1043,7 +1092,7 @@ class CodeIndexer:
                         if r.confidence_score > self.high_confidence_threshold
                     ]
                 ),
-                "analyzer_version": "1.3.0",  # Updated version to reflect concurrent support
+                "analyzer_version": "1.4.0",  # Updated version to reflect augmented LLM support
                 "pre_filtering_enabled": self.enable_pre_filtering,
                 "files_before_filtering": len(all_files),
                 "files_after_filtering": len(files_to_analyze),
@@ -1373,7 +1422,7 @@ class CodeIndexer:
         # Build statistics report
         statistics_report = {
             "report_generation_time": datetime.now().isoformat(),
-            "analyzer_version": "1.3.0",
+            "analyzer_version": "1.4.0",
             "configuration_used": {
                 "config_file": self.indexer_config_path,
                 "concurrent_analysis_enabled": self.enable_concurrent_analysis,
@@ -1481,11 +1530,12 @@ async def main():
     """Main function to run the code indexer with full configuration support"""
 
     # Configuration - can be overridden by config file
-    config_file = "deepcode-mcp/tools/indexer_config.yaml"
+    config_file = "DeepCode/tools/indexer_config.yaml"
+    api_config_file = "DeepCode/mcp_agent.secrets.yaml"
 
     # You can override these parameters or let them be read from config
-    code_base_path = None  # Will use config file value if None
-    output_dir = None  # Will use config file value if None
+    code_base_path = "DeepCode/deepcode_lab/papers/1/code_base/" # Will use config file value if None
+    output_dir = "DeepCode/deepcode_lab/papers/1/indexes/"  # Will use config file value if None
 
     # Target structure - this should be customized for your specific project
     target_structure = """
@@ -1526,6 +1576,7 @@ async def main():
 
     print("🚀 Starting Code Indexer with Enhanced Configuration Support")
     print(f"📋 Configuration file: {config_file}")
+    print(f"🔑 API configuration file: {api_config_file}")
 
     # Create indexer with full configuration support
     try:
@@ -1533,6 +1584,7 @@ async def main():
             code_base_path=code_base_path,  # None = read from config
             target_structure=target_structure,  # Required - project specific
             output_dir=output_dir,  # None = read from config
+            config_path=api_config_file,  # API configuration file
             indexer_config_path=config_file,  # Configuration file
             enable_pre_filtering=True,  # Can be overridden in config
         )
@@ -1540,7 +1592,8 @@ async def main():
         # Display configuration information
         print(f"📁 Code base path: {indexer.code_base_path}")
         print(f"📂 Output directory: {indexer.output_dir}")
-        print(f"🤖 Model provider: {indexer.model_provider}")
+        print(f"🤖 Default models: Anthropic={indexer.default_models['anthropic']}, OpenAI={indexer.default_models['openai']}")
+        print(f"🔧 Preferred LLM: {get_preferred_llm_class(api_config_file).__name__}")
         print(
             f"⚡ Concurrent analysis: {'enabled' if indexer.enable_concurrent_analysis else 'disabled'}"
         )

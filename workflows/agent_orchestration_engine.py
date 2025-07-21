@@ -414,7 +414,7 @@ async def github_repo_download(search_result: str, paper_dir: str, logger) -> st
         )
 
 
-async def paper_reference_analyzer(analysis_result: str, logger) -> str:
+async def paper_reference_analyzer(paper_dir: str, logger) -> str:
     """
     Run the paper reference analysis and GitHub repository workflow.
 
@@ -428,22 +428,26 @@ async def paper_reference_analyzer(analysis_result: str, logger) -> str:
     reference_analysis_agent = Agent(
         name="ReferenceAnalysisAgent",
         instruction=PAPER_REFERENCE_ANALYZER_PROMPT,
-        server_names=["filesystem", "brave", "fetch"],
+        server_names=["filesystem", "fetch"],
     )
+    message = f"""Analyze the research paper in directory: {paper_dir}
+
+Please locate and analyze the markdown (.md) file containing the research paper. **Focus specifically on the References/Bibliography section** to identify and analyze the 5 most relevant references that have GitHub repositories.
+
+Focus on:
+1. **References section analysis** - Extract all citations from the References/Bibliography part
+2. References with high-quality GitHub implementations
+3. Papers cited for methodology, algorithms, or core techniques  
+4. Related work that shares similar technical approaches
+5. Implementation references that could provide code patterns
+
+Goal: Find the most valuable GitHub repositories from the paper's reference list for code implementation reference."""
 
     async with reference_analysis_agent:
         print("Reference analyzer: Connected to server, analyzing references...")
         analyzer = await reference_analysis_agent.attach_llm(get_preferred_llm_class())
 
-        # Set higher token output for reference analysis
-        reference_params = RequestParams(
-            max_tokens=30000,
-            temperature=0.2,
-        )
-
-        reference_result = await analyzer.generate_str(
-            message=analysis_result, request_params=reference_params
-        )
+        reference_result = await analyzer.generate_str(message=message)
         return reference_result
 
 
@@ -576,7 +580,7 @@ async def orchestrate_reference_intelligence_agent(
 
     # Execute reference analysis
     reference_result = await paper_reference_analyzer(
-        dir_info["standardized_text"], logger
+        dir_info["paper_dir"], logger
     )
 
     # Save reference analysis result
