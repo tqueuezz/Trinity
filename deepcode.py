@@ -190,11 +190,11 @@ def main():
             "--theme.base",
             "dark",
             "--theme.primaryColor",
-            "#4dd0e1",
+            "#3b82f6",
             "--theme.backgroundColor",
-            "#0a0e27",
+            "#0f1419",
             "--theme.secondaryBackgroundColor",
-            "#1a1f3a",
+            "#1e293b",
         ]
 
         subprocess.run(cmd, check=True)

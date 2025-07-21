@@ -35,6 +35,23 @@ def get_main_styles() -> str:
             --border-color: rgba(100, 181, 246, 0.2);
         }
 
+        /* Light theme variables */
+        :root {
+            --light-primary-bg: #f8fafc;
+            --light-secondary-bg: #f1f5f9;
+            --light-accent-bg: #e2e8f0;
+            --light-card-bg: rgba(255, 255, 255, 0.9);
+            --light-border-soft: #cbd5e1;
+            --light-border-medium: #94a3b8;
+            --light-text-primary: #1e293b;
+            --light-text-secondary: #475569;
+            --light-text-muted: #64748b;
+            --light-accent-blue: #3b82f6;
+            --light-accent-cyan: #06b6d4;
+            --light-accent-green: #10b981;
+            --light-accent-purple: #8b5cf6;
+        }
+
         /* Global app background and text */
         .stApp {
             background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
@@ -54,6 +71,23 @@ def get_main_styles() -> str:
             box-shadow: 0 0 20px rgba(77, 208, 225, 0.3) !important;
         }
 
+        /* Light mode sidebar - soft and gentle */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg {
+                background: linear-gradient(180deg, var(--light-primary-bg) 0%, var(--light-secondary-bg) 50%, var(--light-accent-bg) 100%) !important;
+                border-right: 1px solid var(--light-border-soft) !important;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+            }
+        }
+
+        /* Alternative light theme detection for Streamlit light theme */
+        [data-theme="light"] .css-1d391kg,
+        .css-1d391kg[data-theme="light"] {
+            background: linear-gradient(180deg, var(--light-primary-bg) 0%, var(--light-secondary-bg) 50%, var(--light-accent-bg) 100%) !important;
+            border-right: 1px solid var(--light-border-soft) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+
         .css-1d391kg * {
             color: var(--text-primary) !important;
             font-weight: 500 !important;
@@ -65,6 +99,42 @@ def get_main_styles() -> str:
             font-size: 1.2rem !important;
             text-shadow: 0 0 15px rgba(77, 208, 225, 0.6) !important;
             border-bottom: 1px solid rgba(77, 208, 225, 0.3) !important;
+            padding-bottom: 0.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+
+        /* Light mode text styling */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg * {
+                color: var(--light-text-primary) !important;
+                font-weight: 500 !important;
+            }
+
+            .css-1d391kg h3 {
+                color: var(--light-accent-blue) !important;
+                font-weight: 600 !important;
+                font-size: 1.2rem !important;
+                text-shadow: none !important;
+                border-bottom: 1px solid var(--light-border-soft) !important;
+                padding-bottom: 0.5rem !important;
+                margin-bottom: 1rem !important;
+            }
+        }
+
+        /* Alternative light theme detection */
+        [data-theme="light"] .css-1d391kg *,
+        .css-1d391kg[data-theme="light"] * {
+            color: var(--light-text-primary) !important;
+            font-weight: 500 !important;
+        }
+
+        [data-theme="light"] .css-1d391kg h3,
+        .css-1d391kg[data-theme="light"] h3 {
+            color: var(--light-accent-blue) !important;
+            font-weight: 600 !important;
+            font-size: 1.2rem !important;
+            text-shadow: none !important;
+            border-bottom: 1px solid var(--light-border-soft) !important;
             padding-bottom: 0.5rem !important;
             margin-bottom: 1rem !important;
         }
@@ -91,6 +161,63 @@ def get_main_styles() -> str:
             padding: 1rem !important;
         }
 
+        /* Light mode info boxes - soft and gentle */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg .stAlert,
+            .css-1d391kg .stInfo,
+            .css-1d391kg .stSuccess,
+            .css-1d391kg .stWarning,
+            .css-1d391kg .stError {
+                background: var(--light-card-bg) !important;
+                border: 1px solid var(--light-border-soft) !important;
+                color: var(--light-text-primary) !important;
+                font-weight: 500 !important;
+                border-radius: 8px !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+                backdrop-filter: none !important;
+                margin: 0.5rem 0 !important;
+                padding: 0.8rem !important;
+            }
+
+            .css-1d391kg .stInfo {
+                border-left: 3px solid var(--light-accent-blue) !important;
+            }
+
+            .css-1d391kg .stSuccess {
+                border-left: 3px solid var(--light-accent-green) !important;
+            }
+
+            .css-1d391kg .stWarning {
+                border-left: 3px solid #f59e0b !important;
+            }
+
+            .css-1d391kg .stError {
+                border-left: 3px solid #ef4444 !important;
+            }
+        }
+
+        /* Alternative light theme detection for info boxes */
+        [data-theme="light"] .css-1d391kg .stAlert,
+        [data-theme="light"] .css-1d391kg .stInfo,
+        [data-theme="light"] .css-1d391kg .stSuccess,
+        [data-theme="light"] .css-1d391kg .stWarning,
+        [data-theme="light"] .css-1d391kg .stError,
+        .css-1d391kg[data-theme="light"] .stAlert,
+        .css-1d391kg[data-theme="light"] .stInfo,
+        .css-1d391kg[data-theme="light"] .stSuccess,
+        .css-1d391kg[data-theme="light"] .stWarning,
+        .css-1d391kg[data-theme="light"] .stError {
+            background: var(--light-card-bg) !important;
+            border: 1px solid var(--light-border-soft) !important;
+            color: var(--light-text-primary) !important;
+            font-weight: 500 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+            backdrop-filter: none !important;
+            margin: 0.5rem 0 !important;
+            padding: 0.8rem !important;
+        }
+
         /* Force white text for sidebar info boxes */
         .css-1d391kg .stInfo div,
         .css-1d391kg .stInfo p,
@@ -98,6 +225,123 @@ def get_main_styles() -> str:
             color: #ffffff !important;
             font-weight: 700 !important;
             font-size: 0.9rem !important;
+        }
+
+        /* Light mode: Override white text for sidebar info boxes */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg .stInfo div,
+            .css-1d391kg .stInfo p,
+            .css-1d391kg .stInfo span {
+                color: var(--light-text-primary) !important;
+                font-weight: 600 !important;
+                font-size: 0.9rem !important;
+            }
+        }
+
+        /* Alternative light theme detection for info box text */
+        [data-theme="light"] .css-1d391kg .stInfo div,
+        [data-theme="light"] .css-1d391kg .stInfo p,
+        [data-theme="light"] .css-1d391kg .stInfo span,
+        .css-1d391kg[data-theme="light"] .stInfo div,
+        .css-1d391kg[data-theme="light"] .stInfo p,
+        .css-1d391kg[data-theme="light"] .stInfo span {
+            color: var(--light-text-primary) !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* Light mode: Override all alert/info box text colors */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg .stAlert div,
+            .css-1d391kg .stAlert p,
+            .css-1d391kg .stAlert span,
+            .css-1d391kg .stSuccess div,
+            .css-1d391kg .stSuccess p,
+            .css-1d391kg .stSuccess span,
+            .css-1d391kg .stWarning div,
+            .css-1d391kg .stWarning p,
+            .css-1d391kg .stWarning span,
+            .css-1d391kg .stError div,
+            .css-1d391kg .stError p,
+            .css-1d391kg .stError span {
+                color: var(--light-text-primary) !important;
+                font-weight: 600 !important;
+                font-size: 0.9rem !important;
+            }
+        }
+
+        /* Alternative light theme detection for all alert boxes */
+        [data-theme="light"] .css-1d391kg .stAlert div,
+        [data-theme="light"] .css-1d391kg .stAlert p,
+        [data-theme="light"] .css-1d391kg .stAlert span,
+        [data-theme="light"] .css-1d391kg .stSuccess div,
+        [data-theme="light"] .css-1d391kg .stSuccess p,
+        [data-theme="light"] .css-1d391kg .stSuccess span,
+        [data-theme="light"] .css-1d391kg .stWarning div,
+        [data-theme="light"] .css-1d391kg .stWarning p,
+        [data-theme="light"] .css-1d391kg .stWarning span,
+        [data-theme="light"] .css-1d391kg .stError div,
+        [data-theme="light"] .css-1d391kg .stError p,
+        [data-theme="light"] .css-1d391kg .stError span,
+        .css-1d391kg[data-theme="light"] .stAlert div,
+        .css-1d391kg[data-theme="light"] .stAlert p,
+        .css-1d391kg[data-theme="light"] .stAlert span,
+        .css-1d391kg[data-theme="light"] .stSuccess div,
+        .css-1d391kg[data-theme="light"] .stSuccess p,
+        .css-1d391kg[data-theme="light"] .stSuccess span,
+        .css-1d391kg[data-theme="light"] .stWarning div,
+        .css-1d391kg[data-theme="light"] .stWarning p,
+        .css-1d391kg[data-theme="light"] .stWarning span,
+        .css-1d391kg[data-theme="light"] .stError div,
+        .css-1d391kg[data-theme="light"] .stError p,
+        .css-1d391kg[data-theme="light"] .stError span {
+            color: var(--light-text-primary) !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* ============================================
+           LIGHT MODE: COMPREHENSIVE TEXT OVERRIDE
+           ============================================ */
+
+        /* Light mode: Comprehensive sidebar text color override */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg,
+            .css-1d391kg * {
+                color: var(--light-text-primary) !important;
+            }
+
+            .css-1d391kg h1,
+            .css-1d391kg h2,
+            .css-1d391kg h3,
+            .css-1d391kg h4,
+            .css-1d391kg h5,
+            .css-1d391kg h6 {
+                color: var(--light-accent-blue) !important;
+            }
+        }
+
+        /* Alternative light theme detection - Comprehensive override */
+        [data-theme="light"] .css-1d391kg,
+        [data-theme="light"] .css-1d391kg *,
+        .css-1d391kg[data-theme="light"],
+        .css-1d391kg[data-theme="light"] * {
+            color: var(--light-text-primary) !important;
+        }
+
+        [data-theme="light"] .css-1d391kg h1,
+        [data-theme="light"] .css-1d391kg h2,
+        [data-theme="light"] .css-1d391kg h3,
+        [data-theme="light"] .css-1d391kg h4,
+        [data-theme="light"] .css-1d391kg h5,
+        [data-theme="light"] .css-1d391kg h6,
+        .css-1d391kg[data-theme="light"] h1,
+        .css-1d391kg[data-theme="light"] h2,
+        .css-1d391kg[data-theme="light"] h3,
+        .css-1d391kg[data-theme="light"] h4,
+        .css-1d391kg[data-theme="light"] h5,
+        .css-1d391kg[data-theme="light"] h6 {
+            color: var(--light-accent-blue) !important;
         }
 
         /* ================================
@@ -481,6 +725,44 @@ def get_main_styles() -> str:
             transform: translateY(-2px) !important;
         }
 
+        /* Light mode sidebar buttons - gentle and modern */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg .stButton button {
+                background: linear-gradient(135deg, var(--light-accent-blue) 0%, var(--light-accent-cyan) 100%) !important;
+                color: #ffffff !important;
+                font-weight: 600 !important;
+                border: 1px solid var(--light-accent-blue) !important;
+                border-radius: 6px !important;
+                box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15) !important;
+                text-shadow: none !important;
+                transition: all 0.2s ease !important;
+            }
+
+            .css-1d391kg .stButton button:hover {
+                box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25) !important;
+                transform: translateY(-1px) !important;
+            }
+        }
+
+        /* Alternative light theme detection for buttons */
+        [data-theme="light"] .css-1d391kg .stButton button,
+        .css-1d391kg[data-theme="light"] .stButton button {
+            background: linear-gradient(135deg, var(--light-accent-blue) 0%, var(--light-accent-cyan) 100%) !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            border: 1px solid var(--light-accent-blue) !important;
+            border-radius: 6px !important;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15) !important;
+            text-shadow: none !important;
+            transition: all 0.2s ease !important;
+        }
+
+        [data-theme="light"] .css-1d391kg .stButton button:hover,
+        .css-1d391kg[data-theme="light"] .stButton button:hover {
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25) !important;
+            transform: translateY(-1px) !important;
+        }
+
         /* Sidebar expanders - dark tech theme */
         .css-1d391kg .streamlit-expanderHeader {
             background: linear-gradient(135deg, #0d1117 0%, #161b22 100%) !important;
@@ -499,6 +781,48 @@ def get_main_styles() -> str:
             box-shadow: 0 0 10px rgba(186, 104, 200, 0.2) !important;
         }
 
+        /* Light mode sidebar expanders - clean and minimal */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg .streamlit-expanderHeader {
+                background: var(--light-card-bg) !important;
+                color: var(--light-text-primary) !important;
+                border: 1px solid var(--light-border-medium) !important;
+                font-weight: 600 !important;
+                border-radius: 6px !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+            }
+
+            .css-1d391kg .streamlit-expanderContent {
+                background: var(--light-card-bg) !important;
+                border: 1px solid var(--light-border-medium) !important;
+                color: var(--light-text-primary) !important;
+                border-radius: 0 0 6px 6px !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+                border-top: none !important;
+            }
+        }
+
+        /* Alternative light theme detection for expanders */
+        [data-theme="light"] .css-1d391kg .streamlit-expanderHeader,
+        .css-1d391kg[data-theme="light"] .streamlit-expanderHeader {
+            background: var(--light-card-bg) !important;
+            color: var(--light-text-primary) !important;
+            border: 1px solid var(--light-border-medium) !important;
+            font-weight: 600 !important;
+            border-radius: 6px !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .css-1d391kg .streamlit-expanderContent,
+        .css-1d391kg[data-theme="light"] .streamlit-expanderContent {
+            background: var(--light-card-bg) !important;
+            border: 1px solid var(--light-border-medium) !important;
+            color: var(--light-text-primary) !important;
+            border-radius: 0 0 6px 6px !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+            border-top: none !important;
+        }
+
         /* Force high contrast for all sidebar text elements */
         .css-1d391kg span,
         .css-1d391kg p,
@@ -510,9 +834,56 @@ def get_main_styles() -> str:
             font-weight: 600 !important;
         }
 
+        /* Light mode: Override all sidebar text colors */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg span,
+            .css-1d391kg p,
+            .css-1d391kg div,
+            .css-1d391kg label,
+            .css-1d391kg strong,
+            .css-1d391kg b {
+                color: var(--light-text-primary) !important;
+                font-weight: 600 !important;
+            }
+        }
+
+        /* Alternative light theme detection for all sidebar text */
+        [data-theme="light"] .css-1d391kg span,
+        [data-theme="light"] .css-1d391kg p,
+        [data-theme="light"] .css-1d391kg div,
+        [data-theme="light"] .css-1d391kg label,
+        [data-theme="light"] .css-1d391kg strong,
+        [data-theme="light"] .css-1d391kg b,
+        .css-1d391kg[data-theme="light"] span,
+        .css-1d391kg[data-theme="light"] p,
+        .css-1d391kg[data-theme="light"] div,
+        .css-1d391kg[data-theme="light"] label,
+        .css-1d391kg[data-theme="light"] strong,
+        .css-1d391kg[data-theme="light"] b {
+            color: var(--light-text-primary) !important;
+            font-weight: 600 !important;
+        }
+
         /* Sidebar markdown content */
         .css-1d391kg [data-testid="stMarkdownContainer"] p {
             color: #ffffff !important;
+            font-weight: 600 !important;
+            background: none !important;
+        }
+
+        /* Light mode: Override sidebar markdown text */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg [data-testid="stMarkdownContainer"] p {
+                color: var(--light-text-primary) !important;
+                font-weight: 600 !important;
+                background: none !important;
+            }
+        }
+
+        /* Alternative light theme detection for markdown content */
+        [data-theme="light"] .css-1d391kg [data-testid="stMarkdownContainer"] p,
+        .css-1d391kg[data-theme="light"] [data-testid="stMarkdownContainer"] p {
+            color: var(--light-text-primary) !important;
             font-weight: 600 !important;
             background: none !important;
         }
@@ -545,6 +916,29 @@ def get_main_styles() -> str:
         .css-1d391kg .stExpander p,
         .css-1d391kg .stExpander span {
             color: #ffffff !important;
+            font-weight: 600 !important;
+            background: none !important;
+        }
+
+        /* Light mode: Override expander text colors */
+        @media (prefers-color-scheme: light) {
+            .css-1d391kg .stExpander div,
+            .css-1d391kg .stExpander p,
+            .css-1d391kg .stExpander span {
+                color: var(--light-text-primary) !important;
+                font-weight: 600 !important;
+                background: none !important;
+            }
+        }
+
+        /* Alternative light theme detection for expander text */
+        [data-theme="light"] .css-1d391kg .stExpander div,
+        [data-theme="light"] .css-1d391kg .stExpander p,
+        [data-theme="light"] .css-1d391kg .stExpander span,
+        .css-1d391kg[data-theme="light"] .stExpander div,
+        .css-1d391kg[data-theme="light"] .stExpander p,
+        .css-1d391kg[data-theme="light"] .stExpander span {
+            color: var(--light-text-primary) !important;
             font-weight: 600 !important;
             background: none !important;
         }
