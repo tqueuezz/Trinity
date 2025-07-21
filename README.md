@@ -8,8 +8,8 @@
 <td align="left" style="vertical-align: middle; padding: 10px 0 10px 30px; border: none;">
   <pre style="font-family: 'Courier New', monospace; font-size: 16px; color: #0EA5E9; margin: 0; padding: 0; text-shadow: 0 0 10px #0EA5E9, 0 0 20px rgba(14,165,233,0.5); line-height: 1.2; transform: skew(-1deg, 0deg); display: block;">    ██████╗ ███████╗███████╗██████╗  ██████╗ ██████╗ ██████╗ ███████╗
     ██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝██╔═══██╗██╔══██╗██╔════╝
-    ██║  ██║█████╗  █████╗  ██████╔╝██║     ██║   ██║██║  ██║█████╗  
-    ██║  ██║██╔══╝  ██╔══╝  ██╔═══╝ ██║     ██║   ██║██║  ██║██╔══╝  
+    ██║  ██║█████╗  █████╗  ██████╔╝██║     ██║   ██║██║  ██║█████╗
+    ██║  ██║██╔══╝  ██╔══╝  ██╔═══╝ ██║     ██║   ██║██║  ██║██╔══╝
     ██████╔╝███████╗███████╗██║     ╚██████╗╚██████╔╝██████╔╝███████╗
     ╚═════╝ ╚══════╝╚══════╝╚═╝      ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝</pre>
 </td>
@@ -40,14 +40,14 @@
 **Terminal-Based Development**
 
 <div align="center">
-  
+
   <img src="https://github.com/Zongwei9888/Experiment_Images/blob/8882a7313c504ca97ead6e7b36c51aa761b6a4f3/DeepCode_images/CLI.gif" alt="CLI Interface Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 20px rgba(45,55,72,0.3); margin: 15px 0;"/>
-  
+
   <div style="background: linear-gradient(135deg, #2D3748 0%, #4A5568 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white;">
     <strong>🚀 Advanced Terminal Experience</strong><br/>
     <small>⚡ Fast command-line workflow<br/>🔧 Developer-friendly interface<br/>📊 Real-time progress tracking</small>
   </div>
-  
+
   *Professional terminal interface for advanced users and CI/CD integration*
 </div>
 
@@ -58,14 +58,14 @@
 **Visual Interactive Experience**
 
 <div align="center">
-  
+
   <img src="https://github.com/Zongwei9888/Experiment_Images/raw/8882a7313c504ca97ead6e7b36c51aa761b6a4f3/DeepCode_images/UI.gif" alt="Web Interface Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 20px rgba(14,165,233,0.3); margin: 15px 0;"/>
-  
+
   <div style="background: linear-gradient(135deg, #0EA5E9 0%, #00D4FF 100%); border-radius: 12px; padding: 15px; margin: 15px 0; color: white;">
     <strong>🎨 Modern Web Dashboard</strong><br/>
     <small>🖱️ Intuitive drag-and-drop<br/>📱 Responsive design<br/>🎯 Visual progress tracking</small>
   </div>
-  
+
   *Beautiful web interface with streamlined workflow for all skill levels*
 </div>
 
@@ -88,7 +88,7 @@
 ## 📑 Table of Contents
 
 - [🚀 Key Features](#-key-features)
-- [🏗️ Architecture](#️-architecture)  
+- [🏗️ Architecture](#️-architecture)
 - [🚀 Quick Start](#-quick-start)
 - [💡 Examples](#-examples)
   - [🎬 Live Demonstrations](#-live-demonstrations)
@@ -176,7 +176,7 @@
 </table>
 
 <br/>
-  
+
 ### 🎯 **Autonomous Multi-Agent Workflow**
 
 **The Challenges**:
@@ -197,7 +197,7 @@
 flowchart LR
     A["📄 Research Papers<br/>💬 Text Prompts<br/>🌐 URLs & Document<br/>📎 Files: PDF, DOC, PPTX, TXT, HTML"] --> B["🧠 DeepCode<br/>Multi-Agent Engine"]
     B --> C["🚀 Algorithm Implementation <br/>🎨 Frontend Development <br/>⚙️ Backend Development"]
-    
+
     style A fill:#ff6b6b,stroke:#c0392b,stroke-width:2px,color:#000
     style B fill:#00d4ff,stroke:#0984e3,stroke-width:3px,color:#000
     style C fill:#00b894,stroke:#00a085,stroke-width:2px,color:#000
@@ -235,7 +235,7 @@ Advanced retrieval-augmented generation combining semantic vector embeddings wit
 ### 🔧 **Core Techniques**
 
 - 🧠 **Intelligent Orchestration Agent** Central decision-making system that coordinates workflow phases and analyzes requirements. Employs dynamic planning algorithms to adapt execution strategies in real-time based on evolving project complexity. Dynamically selects optimal processing strategies for each implementation step. <br>
-  
+
 - **💾 Efficient Memory Mechanism: Advanced context engineering system that manages large-scale code contexts efficiently. Implements hierarchical memory structures with intelligent compression for handling complex codebases. This component enables instant retrieval of implementation patterns and maintains semantic coherence across extended development sessions. <br>
 
 - **🔍 Advanced CodeRAG System**: Global code comprehension engine that analyzes complex inter-dependencies across repositories. Performs cross-codebase relationship mapping to understand architectural patterns from a holistic perspective. This module leverages dependency graphs and semantic analysis to provide globally-aware code recommendations during implementation.
@@ -247,15 +247,15 @@ Advanced retrieval-augmented generation combining semantic vector embeddings wit
 - **🎯 Central Orchestrating Agent**: Orchestrates entire workflow execution and makes strategic decisions. Coordinates specialized agents based on input complexity analysis. Implements dynamic task planning and resource allocation algorithms. <br>
 
 - **📝 Intent Understanding Agent**: Performs deep semantic analysis of user requirements to decode complex intentions. Extracts functional specifications and technical constraints through advanced NLP processing. Transforms ambiguous human descriptions into precise, actionable development specifications with structured task decomposition. <br>
-  
+
 - **📄 Document Parsing Agent**: Processes complex technical documents and research papers with advanced parsing capabilities. Extracts algorithms and methodologies using document understanding models. Converts academic concepts into practical implementation specifications through intelligent content analysis. <br>
 
 - **🏗️ Code Planning Agent**: Performs architectural design and technology stack optimization. Dynamic planning for adaptive development roadmaps. Enforces coding standards and generates modular structures through automated design pattern selection.<br>
-  
+
 - **🔍 Code Reference Mining Agent**: Discovers relevant repositories and frameworks through intelligent search algorithms. Analyzes codebases for compatibility and integration potential. Provides recommendations based on similarity metrics and automated dependency analysis. <br>
 
 - **📚 Code Indexing Agent**: Builds comprehensive knowledge graphs of discovered codebases. Maintains semantic relationships between code components. Enables intelligent retrieval and cross-reference capabilities. <br>
-  
+
 - **🧬 Code Generation Agent**: Synthesizes gathered information into executable code implementations. Creates functional interfaces and integrates discovered components. Generates comprehensive test suites and documentation for reproducibility.
 
 ---
@@ -410,13 +410,11 @@ cd DeepCode/
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 🔧 Install dependencies with UV
-cd deepcode-mcp
 uv venv --python=3.13
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt
 
 # 🔑 Configure API keys (required)
-cp mcp_agent.secrets.yaml.example mcp_agent.secrets.yaml
 # Edit mcp_agent.secrets.yaml with your API keys and base_url:
 # - openai: api_key, base_url (for OpenAI/custom endpoints)
 # - anthropic: api_key (for Claude models)
@@ -433,10 +431,9 @@ git clone https://github.com/HKUDS/deepcode-agent.git
 cd DeepCode/
 
 # 📦 Install dependencies
-pip install -r deepcode-mcp/requirements.txt
+pip install -r requirements.txt
 
 # 🔑 Configure API keys (required)
-cp deepcode-mcp/mcp_agent.secrets.yaml.example deepcode-mcp/mcp_agent.secrets.yaml
 # Edit mcp_agent.secrets.yaml with your API keys and base_url:
 # - openai: api_key, base_url (for OpenAI/custom endpoints)
 # - anthropic: api_key (for Claude models)
@@ -452,7 +449,6 @@ Choose your preferred interface:
 
 #### 🌐 **Web Interface** (Recommended)
 ```bash
-cd deepcode-mcp
 # Using UV
 uv run streamlit run ui/streamlit_app.py
 # Or using traditional Python
@@ -464,7 +460,6 @@ streamlit run ui/streamlit_app.py
 
 #### 🖥️ **CLI Interface** (Advanced Users)
 ```bash
-cd deepcode-mcp
 # Using UV
 uv run python cli/main_cli.py
 # Or using traditional Python
@@ -480,7 +475,7 @@ python cli/main_cli.py
 2. **🤖 Processing**: Watch the multi-agent system analyze and plan
 3. **⚡ Output**: Receive production-ready code with tests and documentation
 
-  
+
   ---
 
 ## 💡 Examples
@@ -506,9 +501,9 @@ python cli/main_cli.py
   <a href="https://www.youtube.com/watch?v=MQZYpLkzsbw">
     <img src="https://img.youtube.com/vi/MQZYpLkzsbw/maxresdefault.jpg" alt="Paper2Code Demo" width="100%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
   </a>
-  
+
   **[▶️ Watch Demo](https://www.youtube.com/watch?v=MQZYpLkzsbw)**
-  
+
   *Transform academic papers into production-ready code automatically*
 </div>
 
@@ -522,9 +517,9 @@ python cli/main_cli.py
   <a href="https://www.youtube.com/watch?v=nFt5mLaMEac">
     <img src="https://img.youtube.com/vi/nFt5mLaMEac/maxresdefault.jpg" alt="Image Processing Demo" width="100%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
   </a>
-  
+
   **[▶️ Watch Demo](https://www.youtube.com/watch?v=nFt5mLaMEac)**
-  
+
   *Intelligent image processing with background removal and enhancement*
 </div>
 
@@ -538,9 +533,9 @@ python cli/main_cli.py
   <a href="https://www.youtube.com/watch?v=78wx3dkTaAU">
     <img src="https://img.youtube.com/vi/78wx3dkTaAU/maxresdefault.jpg" alt="Frontend Demo" width="100%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
   </a>
-  
+
   **[▶️ Watch Demo](https://www.youtube.com/watch?v=78wx3dkTaAU)**
-  
+
   *Full-stack web development from concept to deployment*
 </div>
 
@@ -561,7 +556,7 @@ We're continuously enhancing DeepCode with exciting new features:
 - **Code Quality Assurance**: Multi-level validation through static analysis, dynamic testing, and performance benchmarking.
 - **Smart Debugging**: AI-powered error detection with automatic correction suggestions
 
-#### 📊 **PaperBench Performance Showcase**  
+#### 📊 **PaperBench Performance Showcase**
 - **Benchmark Dashboard**: Comprehensive performance metrics on the PaperBench evaluation suite.
 - **Accuracy Metrics**: Detailed comparison with state-of-the-art paper reproduction systems.
 - **Success Analytics**: Statistical analysis across paper categories and complexity levels.
@@ -617,4 +612,4 @@ We're continuously enhancing DeepCode with exciting new features:
 
 <img src="https://visitor-badge.laobi.icu/badge?page_id=deepcode.readme&style=for-the-badge&color=00d4ff" alt="Visitors">
 
-</div> 
+</div>
