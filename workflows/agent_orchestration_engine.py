@@ -437,7 +437,7 @@ Please locate and analyze the markdown (.md) file containing the research paper.
 Focus on:
 1. **References section analysis** - Extract all citations from the References/Bibliography part
 2. References with high-quality GitHub implementations
-3. Papers cited for methodology, algorithms, or core techniques  
+3. Papers cited for methodology, algorithms, or core techniques
 4. Related work that shares similar technical approaches
 5. Implementation references that could provide code patterns
 
@@ -579,9 +579,7 @@ async def orchestrate_reference_intelligence_agent(
             return f.read()
 
     # Execute reference analysis
-    reference_result = await paper_reference_analyzer(
-        dir_info["paper_dir"], logger
-    )
+    reference_result = await paper_reference_analyzer(dir_info["paper_dir"], logger)
 
     # Save reference analysis result
     with open(reference_path, "w", encoding="utf-8") as f:

@@ -28,6 +28,7 @@ from mcp_agent.workflows.llm.augmented_llm_anthropic import AnthropicAugmentedLL
 from mcp_agent.workflows.llm.augmented_llm_openai import OpenAIAugmentedLLM
 import yaml
 
+
 def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml"):
     """
     Automatically select the LLM class based on API key availability in configuration.
@@ -1534,8 +1535,10 @@ async def main():
     api_config_file = "DeepCode/mcp_agent.secrets.yaml"
 
     # You can override these parameters or let them be read from config
-    code_base_path = "DeepCode/deepcode_lab/papers/1/code_base/" # Will use config file value if None
-    output_dir = "DeepCode/deepcode_lab/papers/1/indexes/"  # Will use config file value if None
+    code_base_path = "DeepCode/deepcode_lab/papers/1/code_base/"  # Will use config file value if None
+    output_dir = (
+        "DeepCode/deepcode_lab/papers/1/indexes/"  # Will use config file value if None
+    )
 
     # Target structure - this should be customized for your specific project
     target_structure = """
@@ -1592,7 +1595,9 @@ async def main():
         # Display configuration information
         print(f"📁 Code base path: {indexer.code_base_path}")
         print(f"📂 Output directory: {indexer.output_dir}")
-        print(f"🤖 Default models: Anthropic={indexer.default_models['anthropic']}, OpenAI={indexer.default_models['openai']}")
+        print(
+            f"🤖 Default models: Anthropic={indexer.default_models['anthropic']}, OpenAI={indexer.default_models['openai']}"
+        )
         print(f"🔧 Preferred LLM: {get_preferred_llm_class(api_config_file).__name__}")
         print(
             f"⚡ Concurrent analysis: {'enabled' if indexer.enable_concurrent_analysis else 'disabled'}"
