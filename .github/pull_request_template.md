@@ -1,5 +1,5 @@
 <!--
-Thanks for contributing to Code Agent!
+Thanks for contributing to DeepCode!
 
 Please ensure your pull request is ready for review before submitting.
 
