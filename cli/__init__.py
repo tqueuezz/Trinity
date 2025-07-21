@@ -15,8 +15,4 @@ from .cli_app import main as cli_main
 from .cli_interface import CLIInterface
 from .cli_launcher import main as launcher_main
 
-__all__ = [
-    "cli_main",
-    "CLIInterface", 
-    "launcher_main"
-] 
+__all__ = ["cli_main", "CLIInterface", "launcher_main"]

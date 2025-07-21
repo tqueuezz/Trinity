@@ -35,7 +35,7 @@ except ImportError:
 __all__ = [
     "main_layout",
     "display_header",
-    "display_features", 
+    "display_features",
     "display_status",
     "initialize_session_state",
     "get_main_styles",

@@ -311,7 +311,7 @@ class CodeIndexer:
             self.llm_client = "mock"
             self.llm_client_type = "mock"
             return "mock", "mock"
-        
+
         # Try configured provider first
         if self.model_provider.lower() == "anthropic":
             try:
@@ -1112,7 +1112,9 @@ class CodeIndexer:
 
             # Process tasks and collect results
             if self.verbose_output:
-                self.logger.info(f"Starting concurrent analysis of {len(tasks)} files...")
+                self.logger.info(
+                    f"Starting concurrent analysis of {len(tasks)} files..."
+                )
 
             try:
                 results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -1147,13 +1149,13 @@ class CodeIndexer:
                 for task in tasks:
                     if not task.done() and not task.cancelled():
                         task.cancel()
-                
+
                 # Wait for cancelled tasks to complete
                 try:
                     await asyncio.sleep(0.1)  # Brief wait for cancellation
                 except Exception:
                     pass
-                
+
                 # Fallback to sequential processing
                 self.logger.info("Falling back to sequential processing...")
                 return await self._process_files_sequentially(files_to_analyze)
@@ -1164,37 +1166,40 @@ class CodeIndexer:
                 )
 
             return file_summaries, all_relationships
-            
+
         except Exception as e:
             # Ensure all tasks are cancelled in case of unexpected errors
             if tasks:
                 for task in tasks:
                     if not task.done() and not task.cancelled():
                         task.cancel()
-                        
+
             # Wait briefly for cancellation to complete
             try:
                 await asyncio.sleep(0.1)
             except Exception:
                 pass
-            
+
             self.logger.error(f"Critical error in concurrent processing: {e}")
             # Fallback to sequential processing
-            self.logger.info("Falling back to sequential processing due to critical error...")
+            self.logger.info(
+                "Falling back to sequential processing due to critical error..."
+            )
             return await self._process_files_sequentially(files_to_analyze)
-        
+
         finally:
             # Final cleanup: ensure all tasks are properly finished
             if tasks:
                 for task in tasks:
                     if not task.done() and not task.cancelled():
                         task.cancel()
-                        
+
             # Clear task references to help with garbage collection
             tasks.clear()
-            
+
             # Force garbage collection to help clean up semaphore and related resources
             import gc
+
             gc.collect()
 
     async def build_all_indexes(self) -> Dict[str, str]:

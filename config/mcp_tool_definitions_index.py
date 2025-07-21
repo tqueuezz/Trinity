@@ -70,11 +70,11 @@ class MCPToolDefinitions:
                 "properties": {
                     "file_path": {
                         "type": "string",
-                        "description": "File path to check for summary information in implement_code_summary.md"
+                        "description": "File path to check for summary information in implement_code_summary.md",
                     }
                 },
-                "required": ["file_path"]
-            }
+                "required": ["file_path"],
+            },
         }
 
     @staticmethod
@@ -152,7 +152,6 @@ class MCPToolDefinitions:
             },
         }
 
-
     @staticmethod
     def _get_file_structure_tool() -> Dict[str, Any]:
         """文件结构获取工具定义"""
@@ -187,25 +186,25 @@ class MCPToolDefinitions:
                 "properties": {
                     "indexes_path": {
                         "type": "string",
-                        "description": "Path to the indexes directory containing JSON index files"
+                        "description": "Path to the indexes directory containing JSON index files",
                     },
                     "target_file": {
                         "type": "string",
-                        "description": "Target file path to be implemented"
+                        "description": "Target file path to be implemented",
                     },
                     "keywords": {
                         "type": "string",
                         "description": "Search keywords, comma-separated",
-                        "default": ""
+                        "default": "",
                     },
                     "max_results": {
                         "type": "integer",
                         "description": "Maximum number of results to return",
-                        "default": 10
-                    }
+                        "default": 10,
+                    },
                 },
-                "required": ["indexes_path", "target_file"]
-            }
+                "required": ["indexes_path", "target_file"],
+            },
         }
 
     @staticmethod
@@ -219,11 +218,11 @@ class MCPToolDefinitions:
                 "properties": {
                     "indexes_path": {
                         "type": "string",
-                        "description": "Path to the indexes directory containing JSON index files"
+                        "description": "Path to the indexes directory containing JSON index files",
                     }
                 },
-                "required": ["indexes_path"]
-            }
+                "required": ["indexes_path"],
+            },
         }
 
     @staticmethod
@@ -237,11 +236,11 @@ class MCPToolDefinitions:
                 "properties": {
                     "workspace_path": {
                         "type": "string",
-                        "description": "Directory path for the workspace"
+                        "description": "Directory path for the workspace",
                     }
                 },
-                "required": ["workspace_path"]
-            }
+                "required": ["workspace_path"],
+            },
         }
 
     # @staticmethod
@@ -261,7 +260,7 @@ class MCPToolDefinitions:
     #             "required": ["indexes_path"]
     #         }
     #     }
-    
+
     @staticmethod
     def get_available_tool_sets() -> Dict[str, str]:
         """

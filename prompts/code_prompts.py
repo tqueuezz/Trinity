@@ -249,13 +249,13 @@ mathematical_formulation:
     equation_number: "[e.g., Eq. 3]"
     where:
       L_task: "task loss"
-      L_explain: "explanation loss"  
+      L_explain: "explanation loss"
       λ: "weighting parameter (default: 0.5)"
-    
+
 step_by_step_breakdown:
   1. "[Detailed explanation of what step 1 does]"
   2. "[What step 2 computes and why]"
-  
+
 implementation_details:
   - "Uses softmax temperature τ = 0.1"
   - "Gradient clipping at norm 1.0"
@@ -276,7 +276,7 @@ architecture:
     - "[ReLU activation]"
     - "[BatchNorm2d(64)]"
   output: "[shape and meaning]"
-  
+
 special_features:
   - "[Any unique aspects]"
   - "[Special initialization]"
@@ -289,17 +289,17 @@ Extract the COMPLETE training process:
 training_loop:
   outer_iterations: "[number or condition]"
   inner_iterations: "[number or condition]"
-  
+
   steps:
     1. "Sample batch of size B from buffer"
     2. "Compute importance weights using..."
     3. "Update policy with loss..."
-    
+
   loss_functions:
     - name: "policy_loss"
       formula: "[exact formula]"
       components: "[what each term means]"
-    
+
   optimization:
     optimizer: "Adam"
     learning_rate: "3e-4"
@@ -316,16 +316,16 @@ hyperparameters:
   batch_size: 64
   buffer_size: 1e6
   discount_gamma: 0.99
-  
+
   # Architecture
   hidden_units: [256, 256]
   activation: "ReLU"
-  
+
   # Algorithm-specific
   explanation_weight: 0.5
   exploration_bonus_scale: 0.1
   reset_probability: 0.3
-  
+
   # Found in:
   location_references:
     - "batch_size: Table 1"
@@ -338,26 +338,26 @@ complete_algorithm_extraction:
   paper_structure:
     method_sections: "[3, 3.1, 3.2, 3.3, 4]"
     algorithm_count: "[total number found]"
-    
+
   main_algorithm:
     [COMPLETE DETAILS AS ABOVE]
-  
+
   supporting_algorithms:
     - [EACH SUPPORTING ALGORITHM WITH FULL DETAILS]
-  
+
   components:
     - [EVERY COMPONENT WITH ARCHITECTURE]
-  
+
   training_details:
     [COMPLETE TRAINING PROCEDURE]
-  
+
   all_hyperparameters:
     [EVERY PARAMETER WITH VALUE AND SOURCE]
-  
+
   implementation_notes:
     - "[Any implementation hint from paper]"
     - "[Tricks mentioned in text]"
-  
+
   missing_but_critical:
     - "[What's not specified but essential]"
     - "[With suggested defaults]"
@@ -378,26 +378,26 @@ Read the ENTIRE paper and create a complete map:
 ```yaml
 paper_structure_map:
   title: "[Full paper title]"
-  
+
   sections:
     1_introduction:
       main_claims: "[What the paper claims to achieve]"
       problem_definition: "[Exact problem being solved]"
-      
+
     2_related_work:
       key_comparisons: "[Methods this work builds upon or competes with]"
-      
+
     3_method:  # May have multiple subsections
       subsections:
         3.1: "[Title and main content]"
         3.2: "[Title and main content]"
       algorithms_presented: "[List all algorithms by name]"
-      
+
     4_experiments:
       environments: "[All test environments/datasets]"
       baselines: "[All comparison methods]"
       metrics: "[All evaluation metrics used]"
-      
+
     5_results:
       main_findings: "[Key results that prove the method works]"
       tables_figures: "[Important result tables/figures to reproduce]"
@@ -409,22 +409,22 @@ For the main method/approach:
 ```yaml
 method_decomposition:
   method_name: "[Full name and acronym]"
-  
+
   core_components:  # Break down into implementable pieces
     component_1:
       name: "[e.g., State Importance Estimator]"
       purpose: "[Why this component exists]"
       paper_section: "[Where it's described]"
-      
+
     component_2:
       name: "[e.g., Policy Refinement Module]"
       purpose: "[Its role in the system]"
       paper_section: "[Where it's described]"
-      
+
   component_interactions:
     - "[How component 1 feeds into component 2]"
     - "[Data flow between components]"
-    
+
   theoretical_foundation:
     key_insight: "[The main theoretical insight]"
     why_it_works: "[Intuitive explanation]"
@@ -440,16 +440,16 @@ implementation_map:
       section: "[Where defined]"
       complexity: "[Simple/Medium/Complex]"
       dependencies: "[What it needs to work]"
-      
+
   models_to_build:
     - model: "[Neural network or other model]"
       architecture_location: "[Section describing it]"
       purpose: "[What this model does]"
-      
+
   data_processing:
     - pipeline: "[Data preprocessing needed]"
       requirements: "[What the data should look like]"
-      
+
   evaluation_suite:
     - metric: "[Metric name]"
       formula_location: "[Where it's defined]"
@@ -466,11 +466,11 @@ experiments_analysis:
       proves: "[What claim this validates]"
       requires: "[Components needed to run this]"
       expected_outcome: "[Specific numbers/trends]"
-      
+
   ablation_studies:
     - study: "[What is being ablated]"
       purpose: "[What this demonstrates]"
-      
+
   baseline_comparisons:
     - baseline: "[Method name]"
       implementation_required: "[Yes/No/Partial]"
@@ -485,10 +485,10 @@ success_criteria:
   must_achieve:
     - "[Primary result that must be reproduced]"
     - "[Core behavior that must be demonstrated]"
-    
+
   should_achieve:
     - "[Secondary results that validate the method]"
-    
+
   validation_evidence:
     - "[Specific figure/table to reproduce]"
     - "[Qualitative behavior to demonstrate]"
@@ -502,21 +502,21 @@ comprehensive_paper_analysis:
     core_contribution: "[One sentence summary]"
     implementation_complexity: "[Low/Medium/High]"
     estimated_components: "[Number of major components to build]"
-    
+
   complete_structure_map:
     [FULL SECTION BREAKDOWN AS ABOVE]
-    
+
   method_architecture:
     [DETAILED COMPONENT BREAKDOWN]
-    
+
   implementation_requirements:
     [ALL ALGORITHMS, MODELS, DATA, METRICS]
-    
+
   reproduction_roadmap:
     phase_1: "[What to implement first]"
     phase_2: "[What to build next]"
     phase_3: "[Final components and validation]"
-    
+
   validation_checklist:
     - "[ ] [Specific result to achieve]"
     - "[ ] [Behavior to demonstrate]"
@@ -553,7 +553,7 @@ detailed_file_specifications:
   src/core/[algorithm_name].py:
     implements: "[Exact algorithm name from paper]"
     algorithm_reference: "[Section X.Y, Algorithm Z]"
-    
+
     classes:
       - name: "[ClassName]"
         purpose: "[What this class does]"
@@ -561,19 +561,19 @@ detailed_file_specifications:
           - method: "__init__"
             parameters: "[list all parameters with types]"
             initializes: "[what gets initialized]"
-            
+
           - method: "[method_name]"
             implements: "[Which equation/algorithm step]"
             formula: "[Exact formula from paper]"
             inputs: "[parameter: type, ...]"
             outputs: "[return type and meaning]"
-            
+
     functions:
       - name: "[function_name]"
         implements: "[Equation X from Section Y]"
         pseudocode: |
           [EXACT pseudocode from paper]
-        
+
     dependencies:
       imports_from: "[other project files]"
       external: "[numpy, torch, etc.]"
@@ -587,12 +587,12 @@ Map EVERY algorithm/formula to its implementation location:
 algorithm_implementation_map:
   "StateMask Explanation (Algorithm 1)":
     primary_file: "src/models/mask_network.py"
-    supporting_files: 
+    supporting_files:
       - "src/utils/mask_utils.py"
     key_functions:
       - "compute_importance_scores: Implements Eq. 3-5"
       - "optimize_mask: Implements Algorithm 1 steps 3-7"
-      
+
   "Mixed Distribution Construction (Section 3.2)":
     primary_file: "src/core/mixed_distribution.py"
     formulas_implemented:
@@ -612,13 +612,13 @@ complete_configuration:
       layers: [400, 300]  # "two hidden layers of 400 and 300 units"
       activation: "relu"
       initialization: "xavier_uniform"
-    
-  # From Table 1  
+
+  # From Table 1
   training_hyperparameters:
     learning_rate: 3e-4
     batch_size: 64
     buffer_size: 1e6
-    
+
   # From Section 3.3
   algorithm_parameters:
     reset_probability: 0.3  # "p = 0.3 in all experiments"
@@ -632,7 +632,7 @@ complete_reproduction_plan:
   paper_info:
     title: "[Full paper title]"
     core_contribution: "[Main innovation being reproduced]"
-    
+
   # SECTION 1: Complete File Structure with Detailed Specifications
   file_structure:
     [PROJECT_NAME]/
@@ -654,7 +654,7 @@ complete_reproduction_plan:
     │   └── ablation_[component].py  # Reproduces Section 5.3 ablation
     └── configs/
         └── hyperparameters.yaml     # All parameters from paper
-  
+
   # SECTION 2: Algorithm Implementation Details
   algorithm_implementations:
     - algorithm: "[Name from paper]"
@@ -667,7 +667,7 @@ complete_reproduction_plan:
       formulas:
         - equation: "[LaTeX formula]"
           code: "[Python implementation]"
-  
+
   # SECTION 3: Model Architectures
   model_specifications:
     - model: "[Model name]"
@@ -678,8 +678,8 @@ complete_reproduction_plan:
         Layer 2: [type, size, activation]
         Output: [shape and type]
       initialization: "[How to initialize]"
-      
-  # SECTION 4: Training Procedures  
+
+  # SECTION 4: Training Procedures
   training_procedures:
     main_training_loop:
       file: "src/training/train.py"
@@ -690,7 +690,7 @@ complete_reproduction_plan:
         - name: "[loss name]"
           formula: "[exact formula]"
           implementation: "[Python code]"
-          
+
   # SECTION 5: Experiments
   experiments:
     - name: "[Experiment name from paper]"
@@ -700,19 +700,19 @@ complete_reproduction_plan:
         metric: "[exact value ± tolerance]"
       setup:
         - "[Specific setup step]"
-        
+
   # SECTION 6: Dependencies & Environment
   environment:
     python: "[version]"
     cuda: "[version if needed]"
     packages:
       - "[package==exact.version]"
-      
+
   # SECTION 7: Missing Details & Defaults
   missing_details_solutions:
     - missing: "[What wasn't specified]"
       solution: "[Reasonable default with justification]"
-      
+
   # SECTION 8: Implementation Order
   implementation_roadmap:
     week_1:
@@ -724,7 +724,7 @@ complete_reproduction_plan:
     week_3:
       - "Run [main experiment]"
       - "Compare with [expected results]"
-      
+
   # SECTION 9: Validation Checklist
   validation_checklist:
     algorithm_correctness:
@@ -958,7 +958,7 @@ For each implementation cycle:
 
 # # 🔥 CORE RULES
 # - **CONTINUOUS**: Implement files continuously until plan completion
-# - **ONE FILE PER RESPONSE**: Exactly one complete file per response cycle  
+# - **ONE FILE PER RESPONSE**: Exactly one complete file per response cycle
 # - **ALWAYS USE TOOLS**: Must use write_file tool for every implementation
 # - **DEPENDENCY-AWARE**: Analyze dependencies before implementing each file
 
@@ -979,7 +979,7 @@ For each implementation cycle:
 # ## 3. File Implementation Process
 # ```
 # 1. Identify next file from plan priorities
-# 2. Search reference code for unfamiliar file types  
+# 2. Search reference code for unfamiliar file types
 # 3. Read related existing files for consistency
 # 4. Implement complete file with proper integration
 # 5. Continue immediately to next file
@@ -1008,7 +1008,7 @@ For each implementation cycle:
 # # 📋 MANDATORY RESPONSE FORMAT
 # ```
 # Implementing: [file_path]
-# Purpose: [brief_description]  
+# Purpose: [brief_description]
 # Dependencies: [files_to_read_first]
 
 # [Use search_reference_code if unfamiliar file type]
@@ -1049,7 +1049,7 @@ PURE_CODE_IMPLEMENTATION_SYSTEM_PROMPT = """You are an expert code implementatio
 Build incrementally using multiple tool calls. For each step:
 1. **Identify** what needs to be implemented from the paper
 2. **Analyze Dependencies**: Before implementing each new file, use `read_code_mem` to read summaries of already-implemented files, then search for reference patterns to guide your implementation approach.
-3. **Implement** one component at a time  
+3. **Implement** one component at a time
 4. **Test** immediately to catch issues early
 5. **Integrate** with existing components
 6. **Verify** against paper specifications
@@ -1057,7 +1057,7 @@ Build incrementally using multiple tool calls. For each step:
 **TOOL CALLING STRATEGY**:
 1. ⚠️ **SINGLE FUNCTION CALL PER MESSAGE**: Each message may perform only one function call. You will see the result of the function right after sending the message. If you need to perform multiple actions, you can always send more messages with subsequent function calls. Do some reasoning before your actions, describing what function calls you are going to use and how they fit into your plan.
 
-2. **SEARCH_CODE_REFERENCES Usage Guide (OPTIONAL REFERENCE TOOL)**: 
+2. **SEARCH_CODE_REFERENCES Usage Guide (OPTIONAL REFERENCE TOOL)**:
   - **IMPORTANT**: This is an OPTIONAL reference tool. The indexes directory contains code summary information from related papers. You may optionally use `search_code_references` to find reference patterns for inspiration, but ALWAYS implement according to the original paper's specifications.
   - **Reference only**: Use `search_code_references(indexes_path="indexes", target_file=the_file_you_want_to_implement, keywords=the_keywords_you_want_to_search)` for reference, NOT as implementation standard
   - **Core principle**: Original paper requirements take absolute priority over any reference code found
@@ -1108,7 +1108,7 @@ You are an expert code implementation agent for academic paper reproduction. You
 Build incrementally using multiple tool calls. For each step:
 1. **Identify** what needs to be implemented from the paper
 2. **Analyze Dependencies**: Before implementing each new file, use `read_code_mem` to read summaries of already-implemented files, then search for reference patterns to guide your implementation approach.
-3. **Implement** one component at a time  
+3. **Implement** one component at a time
 4. **Test** immediately to catch issues early
 5. **Integrate** with existing components
 6. **Verify** against paper specifications
@@ -1116,7 +1116,7 @@ Build incrementally using multiple tool calls. For each step:
 **TOOL CALLING STRATEGY**:
 1. ⚠️ **SINGLE FUNCTION CALL PER MESSAGE**: Each message may perform only one function call. You will see the result of the function right after sending the message. If you need to perform multiple actions, you can always send more messages with subsequent function calls. Do some reasoning before your actions, describing what function calls you are going to use and how they fit into your plan.
 
-2. **SEARCH_CODE_REFERENCES Usage Guide (OPTIONAL REFERENCE TOOL)**: 
+2. **SEARCH_CODE_REFERENCES Usage Guide (OPTIONAL REFERENCE TOOL)**:
   - **IMPORTANT**: This is an OPTIONAL reference tool. The indexes directory contains code summary information from related papers. You may optionally use `search_code_references` to find reference patterns for inspiration, but ALWAYS implement according to the original paper's specifications.
   - **Reference only**: Use `search_code_references(indexes_path="indexes", target_file=the_file_you_want_to_implement, keywords=the_keywords_you_want_to_search)` for reference, NOT as implementation standard
   - **Core principle**: Original paper requirements take absolute priority over any reference code found
@@ -1152,7 +1152,6 @@ Before considering the task complete, ensure you have:
 """
 
 
-
 # General-purpose version of the above prompt for non-academic use cases
 GENERAL_CODE_IMPLEMENTATION_SYSTEM_PROMPT = """You are an expert code implementation agent for technical requirements implementation. Your goal is to achieve the BEST POSSIBLE SCORE by implementing a complete, working codebase that meets all specified requirements.
 
@@ -1169,7 +1168,7 @@ GENERAL_CODE_IMPLEMENTATION_SYSTEM_PROMPT = """You are an expert code implementa
 Build incrementally using multiple tool calls. For each step:
 1. **Identify** what needs to be implemented from the requirements
 2. **Analyze Dependencies**: Before implementing each new file, use `read_code_mem` to read summaries of already-implemented files, then search for reference patterns to guide your implementation approach.
-3. **Implement** one component at a time  
+3. **Implement** one component at a time
 4. **Test** immediately using `execute_python` or `execute_bash` to catch issues early - THIS IS MANDATORY, NOT OPTIONAL
 5. **Integrate** with existing components
 6. **Verify** against requirement specifications using execution tools to ensure everything works
@@ -1185,7 +1184,7 @@ Build incrementally using multiple tool calls. For each step:
 
 3. **CRITICAL**: Use `execute_bash` and `execute_python` tools to ACTUALLY IMPLEMENT and TEST the requirements yourself - do not provide instructions. These tools are essential for:
    - Installing dependencies and setting up environments (`execute_bash`)
-   - Testing Python implementations (`execute_python`) 
+   - Testing Python implementations (`execute_python`)
    - Debugging and fixing issues (`execute_bash` for system-level, `execute_python` for Python-specific)
    - Validating that your code actually works before moving to the next component
 
@@ -1227,7 +1226,7 @@ project_plan:
   title: "[Project Name]"
   description: "[Brief description]"
   project_type: "[web_app|game|academic|tool|api|other]"
-  
+
   # CUSTOM FILE TREE STRUCTURE (max 15 files, design as needed)
   file_structure: |
     project_root/
@@ -1238,7 +1237,7 @@ project_plan:
     │   └── [module].py
     ├── requirements.txt        # Dependencies
     └── README.md              # Basic documentation
-    
+
     # IMPORTANT: Output ACTUAL file tree structure above, not placeholder text
     # Examples by project type:
     # Web App: app.py, templates/, static/, models.py, config.py
@@ -1249,7 +1248,7 @@ project_plan:
   # CORE IMPLEMENTATION PLAN
   implementation_steps:
     1. "[First step - usually setup/core structure]"
-    2. "[Second step - main functionality]" 
+    2. "[Second step - main functionality]"
     3. "[Third step - integration/interface]"
     4. "[Fourth step - testing/refinement]"
 
@@ -1269,10 +1268,10 @@ project_plan:
     language: "[primary language]"
     frameworks: ["[framework1]", "[framework2]"]
     key_libraries: ["[lib1]", "[lib2]"]
-    
+
   main_features:
     - "[core feature 1]"
-    - "[core feature 2]" 
+    - "[core feature 2]"
     - "[core feature 3]"
 ```
 

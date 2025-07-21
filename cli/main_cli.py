@@ -11,10 +11,9 @@ import os
 import sys
 import asyncio
 import argparse
-from pathlib import Path
 
 # 禁止生成.pyc文件
-os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 
 # 添加项目根目录到路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -52,21 +51,23 @@ def print_enhanced_banner():
 def check_environment():
     """检查运行环境"""
     print(f"{Colors.CYAN}🔍 Checking environment...{Colors.ENDC}")
-    
+
     # 检查Python版本
     if sys.version_info < (3, 8):
-        print(f"{Colors.FAIL}❌ Python 3.8+ required. Current: {sys.version}{Colors.ENDC}")
+        print(
+            f"{Colors.FAIL}❌ Python 3.8+ required. Current: {sys.version}{Colors.ENDC}"
+        )
         return False
-    
+
     print(f"{Colors.OKGREEN}✅ Python {sys.version.split()[0]} - OK{Colors.ENDC}")
-    
+
     # 检查必要模块
     required_modules = [
-        ('asyncio', 'Async IO support'),
-        ('pathlib', 'Path handling'),
-        ('typing', 'Type hints')
+        ("asyncio", "Async IO support"),
+        ("pathlib", "Path handling"),
+        ("typing", "Type hints"),
     ]
-    
+
     missing_modules = []
     for module, desc in required_modules:
         try:
@@ -75,11 +76,13 @@ def check_environment():
         except ImportError:
             missing_modules.append(module)
             print(f"{Colors.FAIL}❌ {desc} - Missing{Colors.ENDC}")
-    
+
     if missing_modules:
-        print(f"{Colors.FAIL}❌ Missing required modules: {', '.join(missing_modules)}{Colors.ENDC}")
+        print(
+            f"{Colors.FAIL}❌ Missing required modules: {', '.join(missing_modules)}{Colors.ENDC}"
+        )
         return False
-    
+
     print(f"{Colors.OKGREEN}✅ Environment check passed{Colors.ENDC}")
     return True
 
@@ -87,7 +90,7 @@ def check_environment():
 def parse_arguments():
     """解析命令行参数"""
     parser = argparse.ArgumentParser(
-        description='DeepCode CLI - Open-Source Code Agent by Data Intelligence Lab @ HKU',
+        description="DeepCode CLI - Open-Source Code Agent by Data Intelligence Lab @ HKU",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=f"""
 {Colors.BOLD}Examples:{Colors.ENDC}
@@ -100,66 +103,72 @@ def parse_arguments():
 {Colors.BOLD}Pipeline Modes:{Colors.ENDC}
   {Colors.GREEN}Comprehensive{Colors.ENDC}: Full intelligence analysis with indexing
   {Colors.YELLOW}Optimized{Colors.ENDC}:     Fast processing without indexing
-        """
+        """,
     )
-    
+
     parser.add_argument(
-        '--file', '-f',
+        "--file", "-f", type=str, help="Process a specific file (PDF, DOCX, TXT, etc.)"
+    )
+
+    parser.add_argument(
+        "--url", "-u", type=str, help="Process a research paper from URL"
+    )
+
+    parser.add_argument(
+        "--chat",
+        "-t",
         type=str,
-        help='Process a specific file (PDF, DOCX, TXT, etc.)'
+        help="Process coding requirements via chat input (provide requirements as argument)",
     )
-    
+
     parser.add_argument(
-        '--url', '-u',
-        type=str,
-        help='Process a research paper from URL'
+        "--optimized",
+        "-o",
+        action="store_true",
+        help="Use optimized mode (skip indexing for faster processing)",
     )
-    
+
     parser.add_argument(
-        '--chat', '-t',
-        type=str,
-        help='Process coding requirements via chat input (provide requirements as argument)'
+        "--verbose", "-v", action="store_true", help="Enable verbose output"
     )
-    
-    parser.add_argument(
-        '--optimized', '-o',
-        action='store_true',
-        help='Use optimized mode (skip indexing for faster processing)'
-    )
-    
-    parser.add_argument(
-        '--verbose', '-v',
-        action='store_true',
-        help='Enable verbose output'
-    )
-    
+
     return parser.parse_args()
 
 
 async def run_direct_processing(app: CLIApp, input_source: str, input_type: str):
     """直接处理模式（非交互式）"""
     try:
-        print(f"\n{Colors.BOLD}{Colors.CYAN}🚀 Starting direct processing mode...{Colors.ENDC}")
+        print(
+            f"\n{Colors.BOLD}{Colors.CYAN}🚀 Starting direct processing mode...{Colors.ENDC}"
+        )
         print(f"{Colors.CYAN}Input: {input_source}{Colors.ENDC}")
         print(f"{Colors.CYAN}Type: {input_type}{Colors.ENDC}")
-        print(f"{Colors.CYAN}Mode: {'🧠 Comprehensive' if app.cli.enable_indexing else '⚡ Optimized'}{Colors.ENDC}")
-        
+        print(
+            f"{Colors.CYAN}Mode: {'🧠 Comprehensive' if app.cli.enable_indexing else '⚡ Optimized'}{Colors.ENDC}"
+        )
+
         # 初始化应用
         init_result = await app.initialize_mcp_app()
         if init_result["status"] != "success":
-            print(f"{Colors.FAIL}❌ Initialization failed: {init_result['message']}{Colors.ENDC}")
+            print(
+                f"{Colors.FAIL}❌ Initialization failed: {init_result['message']}{Colors.ENDC}"
+            )
             return False
-        
+
         # 处理输入
         result = await app.process_input(input_source, input_type)
-        
-        if result['status'] == 'success':
-            print(f"\n{Colors.BOLD}{Colors.OKGREEN}🎉 Processing completed successfully!{Colors.ENDC}")
+
+        if result["status"] == "success":
+            print(
+                f"\n{Colors.BOLD}{Colors.OKGREEN}🎉 Processing completed successfully!{Colors.ENDC}"
+            )
             return True
         else:
-            print(f"\n{Colors.BOLD}{Colors.FAIL}❌ Processing failed: {result.get('error', 'Unknown error')}{Colors.ENDC}")
+            print(
+                f"\n{Colors.BOLD}{Colors.FAIL}❌ Processing failed: {result.get('error', 'Unknown error')}{Colors.ENDC}"
+            )
             return False
-            
+
     except Exception as e:
         print(f"\n{Colors.FAIL}❌ Direct processing error: {str(e)}{Colors.ENDC}")
         return False
@@ -171,26 +180,32 @@ async def main():
     """主函数"""
     # 解析命令行参数
     args = parse_arguments()
-    
+
     # 显示横幅
     print_enhanced_banner()
-    
+
     # 检查环境
     if not check_environment():
-        print(f"\n{Colors.FAIL}🚨 Environment check failed. Please fix the issues and try again.{Colors.ENDC}")
+        print(
+            f"\n{Colors.FAIL}🚨 Environment check failed. Please fix the issues and try again.{Colors.ENDC}"
+        )
         sys.exit(1)
-    
+
     try:
         # 创建CLI应用
         app = CLIApp()
-        
+
         # 设置配置
         if args.optimized:
             app.cli.enable_indexing = False
-            print(f"\n{Colors.YELLOW}⚡ Optimized mode enabled - indexing disabled{Colors.ENDC}")
+            print(
+                f"\n{Colors.YELLOW}⚡ Optimized mode enabled - indexing disabled{Colors.ENDC}"
+            )
         else:
-            print(f"\n{Colors.GREEN}🧠 Comprehensive mode enabled - full intelligence analysis{Colors.ENDC}")
-        
+            print(
+                f"\n{Colors.GREEN}🧠 Comprehensive mode enabled - full intelligence analysis{Colors.ENDC}"
+            )
+
         # 检查是否为直接处理模式
         if args.file or args.url or args.chat:
             if args.file:
@@ -198,22 +213,24 @@ async def main():
                 if not os.path.exists(args.file):
                     print(f"{Colors.FAIL}❌ File not found: {args.file}{Colors.ENDC}")
                     sys.exit(1)
-                success = await run_direct_processing(app, args.file, 'file')
+                success = await run_direct_processing(app, args.file, "file")
             elif args.url:
-                success = await run_direct_processing(app, args.url, 'url')
+                success = await run_direct_processing(app, args.url, "url")
             elif args.chat:
                 # 验证chat输入长度
                 if len(args.chat.strip()) < 20:
-                    print(f"{Colors.FAIL}❌ Chat input too short. Please provide more detailed requirements (at least 20 characters){Colors.ENDC}")
+                    print(
+                        f"{Colors.FAIL}❌ Chat input too short. Please provide more detailed requirements (at least 20 characters){Colors.ENDC}"
+                    )
                     sys.exit(1)
-                success = await run_direct_processing(app, args.chat, 'chat')
-            
+                success = await run_direct_processing(app, args.chat, "chat")
+
             sys.exit(0 if success else 1)
         else:
             # 交互式模式
             print(f"\n{Colors.CYAN}🎮 Starting interactive mode...{Colors.ENDC}")
             await app.run_interactive_session()
-        
+
     except KeyboardInterrupt:
         print(f"\n{Colors.WARNING}⚠️  Application interrupted by user{Colors.ENDC}")
         sys.exit(1)
@@ -223,4 +240,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())

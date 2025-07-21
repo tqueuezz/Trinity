@@ -25,7 +25,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Version-1.0.0-00d4ff?style=for-the-badge&logo=rocket&logoColor=white" alt="Version">
 
-  <img src="https://img.shields.io/badge/License-Apache_2.0-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License">
+  <img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License">
   <img src="https://img.shields.io/badge/AI-Multi--Agent-9b59b6?style=for-the-badge&logo=brain&logoColor=white" alt="AI">
   <img src="https://img.shields.io/badge/HKU-Data_Intelligence_Lab-f39c12?style=for-the-badge&logo=university&logoColor=white" alt="HKU">
 </p>
@@ -602,9 +602,9 @@ We're continuously enhancing DeepCode with exciting new features:
 
 ### 📄 **License**
 
-<img src="https://img.shields.io/badge/License-Apache_2.0-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="Apache 2.0 License">
+<img src="https://img.shields.io/badge/License-MIT-4ecdc4?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="MIT License">
 
-**Apache License 2.0** - Copyright (c) 2025 Data Intelligence Lab, The University of Hong Kong
+**MIT License** - Copyright (c) 2025 Data Intelligence Lab, The University of Hong Kong
 
 ---
 

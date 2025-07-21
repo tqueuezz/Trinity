@@ -11,83 +11,94 @@ import sys
 import subprocess
 from pathlib import Path
 
+
 def check_dependencies():
     """Check if necessary dependencies are installed"""
     print("🔍 Checking dependencies...")
-    
+
     missing_deps = []
     missing_system_deps = []
-    
+
     try:
         import streamlit
+
         print("✅ Streamlit is installed")
     except ImportError:
         missing_deps.append("streamlit>=1.28.0")
-    
+
     try:
         import yaml
+
         print("✅ PyYAML is installed")
     except ImportError:
         missing_deps.append("pyyaml")
-    
+
     try:
         import asyncio
+
         print("✅ Asyncio is available")
     except ImportError:
         missing_deps.append("asyncio")
-    
+
     # Check PDF conversion dependencies
     try:
         import reportlab
+
         print("✅ ReportLab is installed (for text-to-PDF conversion)")
     except ImportError:
         missing_deps.append("reportlab")
         print("⚠️  ReportLab not found (text files won't convert to PDF)")
-    
+
     # Check LibreOffice for Office document conversion
     try:
         import subprocess
         import platform
-        
+
         subprocess_kwargs = {
             "capture_output": True,
             "text": True,
             "timeout": 5,
         }
-        
+
         if platform.system() == "Windows":
             subprocess_kwargs["creationflags"] = 0x08000000  # Hide console window
-        
+
         # Try different LibreOffice commands
         libreoffice_found = False
         for cmd in ["libreoffice", "soffice"]:
             try:
                 result = subprocess.run([cmd, "--version"], **subprocess_kwargs)
                 if result.returncode == 0:
-                    print(f"✅ LibreOffice is installed (for Office document conversion)")
+                    print(
+                        "✅ LibreOffice is installed (for Office document conversion)"
+                    )
                     libreoffice_found = True
                     break
-            except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
+            except (
+                subprocess.CalledProcessError,
+                FileNotFoundError,
+                subprocess.TimeoutExpired,
+            ):
                 continue
-        
+
         if not libreoffice_found:
             missing_system_deps.append("LibreOffice")
             print("⚠️  LibreOffice not found (Office documents won't convert to PDF)")
-    
+
     except Exception:
         missing_system_deps.append("LibreOffice")
         print("⚠️  Could not check LibreOffice installation")
-    
+
     # Display missing dependencies
     if missing_deps or missing_system_deps:
         print("\n📋 Dependency Status:")
-        
+
         if missing_deps:
             print("❌ Missing Python dependencies:")
             for dep in missing_deps:
                 print(f"   - {dep}")
             print(f"\nInstall with: pip install {' '.join(missing_deps)}")
-        
+
         if missing_system_deps:
             print("\n⚠️  Missing system dependencies (optional for full functionality):")
             for dep in missing_system_deps:
@@ -96,7 +107,7 @@ def check_dependencies():
             print("   - Windows: Download from https://www.libreoffice.org/")
             print("   - macOS: brew install --cask libreoffice")
             print("   - Ubuntu/Debian: sudo apt-get install libreoffice")
-        
+
         # Only fail if critical Python dependencies are missing
         if missing_deps:
             return False
@@ -104,8 +115,9 @@ def check_dependencies():
             print("\n✅ Core dependencies satisfied (optional dependencies missing)")
     else:
         print("✅ All dependencies satisfied")
-    
+
     return True
+
 
 def cleanup_cache():
     """Clean up Python cache files"""
@@ -118,6 +130,7 @@ def cleanup_cache():
         print("✅ Cache cleanup completed")
     except Exception as e:
         print(f"⚠️  Cache cleanup failed: {e}")
+
 
 def print_banner():
     """Display startup banner"""
@@ -135,25 +148,26 @@ def print_banner():
 """
     print(banner)
 
+
 def main():
     """Main function"""
     print_banner()
-    
+
     # Check dependencies
     if not check_dependencies():
         print("\n🚨 Please install missing dependencies and try again.")
         sys.exit(1)
-    
+
     # Get current script directory
     current_dir = Path(__file__).parent
     streamlit_app_path = current_dir / "ui" / "streamlit_app.py"
-    
+
     # Check if streamlit_app.py exists
     if not streamlit_app_path.exists():
         print(f"❌ UI application file not found: {streamlit_app_path}")
         print("Please ensure the ui/streamlit_app.py file exists.")
         sys.exit(1)
-    
+
     print(f"\n📁 UI App location: {streamlit_app_path}")
     print("🌐 Starting DeepCode web interface...")
     print("🚀 Launching on http://localhost:8501")
@@ -161,23 +175,33 @@ def main():
     print("💡 Tip: Keep this terminal open while using the application")
     print("🛑 Press Ctrl+C to stop the server")
     print("=" * 70)
-    
+
     # Launch Streamlit application
     try:
         cmd = [
-            sys.executable, "-m", "streamlit", "run", 
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
             str(streamlit_app_path),
-            "--server.port", "8501",
-            "--server.address", "localhost",
-            "--browser.gatherUsageStats", "false",
-            "--theme.base", "dark",
-            "--theme.primaryColor", "#4dd0e1",
-            "--theme.backgroundColor", "#0a0e27",
-            "--theme.secondaryBackgroundColor", "#1a1f3a"
+            "--server.port",
+            "8501",
+            "--server.address",
+            "localhost",
+            "--browser.gatherUsageStats",
+            "false",
+            "--theme.base",
+            "dark",
+            "--theme.primaryColor",
+            "#4dd0e1",
+            "--theme.backgroundColor",
+            "#0a0e27",
+            "--theme.secondaryBackgroundColor",
+            "#1a1f3a",
         ]
-        
+
         subprocess.run(cmd, check=True)
-        
+
     except subprocess.CalledProcessError as e:
         print(f"\n❌ Failed to start DeepCode: {e}")
         print("Please check if Streamlit is properly installed.")
@@ -193,5 +217,6 @@ def main():
         # Clean up cache files
         cleanup_cache()
 
+
 if __name__ == "__main__":
-    main() 
+    main()

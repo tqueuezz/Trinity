@@ -454,11 +454,11 @@ def get_main_styles() -> str:
         }
 
         @keyframes numberCount {
-            0% { 
+            0% {
                 opacity: 0;
                 transform: scale(0.5);
             }
-            100% { 
+            100% {
                 opacity: 1;
                 transform: scale(1);
             }
@@ -606,11 +606,11 @@ def get_main_styles() -> str:
         }
 
         @keyframes headerPulse {
-            0%, 100% { 
+            0%, 100% {
                 opacity: 0.3;
                 transform: translate(-50%, -50%) scale(1);
             }
-            50% { 
+            50% {
                 opacity: 0.7;
                 transform: translate(-50%, -50%) scale(1.1);
             }
@@ -633,7 +633,7 @@ def get_main_styles() -> str:
         }
 
         @keyframes titleGlow {
-            0% { 
+            0% {
                 filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.3)) drop-shadow(0 0 15px rgba(100, 181, 246, 0.2));
                 text-shadow: 0 0 25px rgba(100, 181, 246, 0.4);
             }
@@ -645,7 +645,7 @@ def get_main_styles() -> str:
                 filter: drop-shadow(0 0 14px rgba(144, 202, 249, 0.35)) drop-shadow(0 0 20px rgba(144, 202, 249, 0.2));
                 text-shadow: 0 0 35px rgba(144, 202, 249, 0.45);
             }
-            100% { 
+            100% {
                 filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.3)) drop-shadow(0 0 15px rgba(100, 181, 246, 0.2));
                 text-shadow: 0 0 25px rgba(100, 181, 246, 0.4);
             }
@@ -1048,11 +1048,11 @@ def get_main_styles() -> str:
         }
 
         @keyframes verticalGlowPulse {
-            0%, 100% { 
+            0%, 100% {
                 transform: rotate(0deg) scale(1);
                 opacity: 0.3;
             }
-            50% { 
+            50% {
                 transform: rotate(180deg) scale(1.1);
                 opacity: 0.7;
             }
@@ -1197,60 +1197,60 @@ def get_main_styles() -> str:
         /* Different themed card styles */
         .feature-card.primary {
             border-color: var(--neon-cyan);
-            background: linear-gradient(135deg, 
-                rgba(77, 208, 225, 0.1) 0%, 
+            background: linear-gradient(135deg,
+                rgba(77, 208, 225, 0.1) 0%,
                 rgba(45, 55, 72, 0.95) 30%);
         }
 
         .feature-card.primary:hover {
             transform: translateY(-8px) scale(1.02);
             border-color: var(--neon-cyan);
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(77, 208, 225, 0.3),
                 0 0 50px rgba(77, 208, 225, 0.2);
         }
 
         .feature-card.secondary {
             border-color: var(--neon-purple);
-            background: linear-gradient(135deg, 
-                rgba(186, 104, 200, 0.1) 0%, 
+            background: linear-gradient(135deg,
+                rgba(186, 104, 200, 0.1) 0%,
                 rgba(45, 55, 72, 0.95) 30%);
         }
 
         .feature-card.secondary:hover {
             transform: translateY(-8px) scale(1.02);
             border-color: var(--neon-purple);
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(186, 104, 200, 0.3),
                 0 0 50px rgba(186, 104, 200, 0.2);
         }
 
         .feature-card.accent {
             border-color: var(--neon-green);
-            background: linear-gradient(135deg, 
-                rgba(129, 199, 132, 0.1) 0%, 
+            background: linear-gradient(135deg,
+                rgba(129, 199, 132, 0.1) 0%,
                 rgba(45, 55, 72, 0.95) 30%);
         }
 
         .feature-card.accent:hover {
             transform: translateY(-8px) scale(1.02);
             border-color: var(--neon-green);
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(129, 199, 132, 0.3),
                 0 0 50px rgba(129, 199, 132, 0.2);
         }
 
         .feature-card.tech {
             border-color: var(--neon-blue);
-            background: linear-gradient(135deg, 
-                rgba(100, 181, 246, 0.1) 0%, 
+            background: linear-gradient(135deg,
+                rgba(100, 181, 246, 0.1) 0%,
                 rgba(45, 55, 72, 0.95) 30%);
         }
 
         .feature-card.tech:hover {
             transform: translateY(-8px) scale(1.02);
             border-color: var(--neon-blue);
-            box-shadow: 
+            box-shadow:
                 0 20px 60px rgba(100, 181, 246, 0.3),
                 0 0 50px rgba(100, 181, 246, 0.2);
         }
@@ -1451,36 +1451,36 @@ def get_main_styles() -> str:
                 margin-bottom: 2rem;
                 border-radius: 20px;
             }
-            
+
             .main-header h1 {
                 font-size: 2.5rem !important;
             }
-            
+
             .main-header h3 {
                 font-size: 1rem !important;
                 letter-spacing: 1.5px !important;
             }
-            
+
             .main-header p {
                 font-size: 0.8rem !important;
                 letter-spacing: 0.5px !important;
             }
-            
+
             .ai-capabilities-section {
                 padding: 1.5rem 1rem;
                 margin: 1.5rem 0;
                 border-radius: 15px;
             }
-            
+
             .capabilities-title {
                 font-size: 1.6rem !important;
             }
-            
+
             .capabilities-subtitle {
                 font-size: 0.8rem !important;
                 letter-spacing: 1px !important;
             }
-            
+
             .feature-card {
                 padding: 1.5rem;
                 margin: 1rem 0;
@@ -1488,23 +1488,23 @@ def get_main_styles() -> str:
                 min-height: 350px;
                 border-radius: 15px;
             }
-            
+
             .neural-network {
                 top: 0.5rem;
                 right: 1rem;
             }
-            
+
             .typing-text {
                 white-space: normal;
                 border-right: none;
                 animation: none;
                 font-size: 0.85rem !important;
             }
-            
+
             .feature-icon {
                 font-size: 2.5rem;
             }
-            
+
             .feature-title {
                 font-size: 1.1rem !important;
             }
@@ -1614,11 +1614,11 @@ def get_main_styles() -> str:
         .code-line.delay-4 { animation-delay: 3.2s; }
 
         @keyframes typeIn {
-            0% { 
+            0% {
                 opacity: 0;
                 transform: translateX(-10px);
             }
-            100% { 
+            100% {
                 opacity: 1;
                 transform: translateX(0);
             }
@@ -2076,13 +2076,13 @@ def get_main_styles() -> str:
         }
 
         @keyframes ecosystemOrbit {
-            0% { 
+            0% {
                 box-shadow: 0 0 10px rgba(100, 181, 246, 0.3);
             }
-            50% { 
+            50% {
                 box-shadow: 0 0 20px rgba(100, 181, 246, 0.5);
             }
-            100% { 
+            100% {
                 box-shadow: 0 0 10px rgba(100, 181, 246, 0.3);
             }
         }
@@ -2093,18 +2093,18 @@ def get_main_styles() -> str:
                 flex-direction: column;
                 gap: 2rem;
             }
-            
+
             .feature-header {
                 flex-direction: column;
                 text-align: center;
                 gap: 1rem;
             }
-            
+
             .feature-stats {
                 flex-direction: row;
                 justify-content: center;
             }
-            
+
             .collaboration-viz,
             .tech-ecosystem {
                 width: 250px;

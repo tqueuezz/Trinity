@@ -25,14 +25,14 @@ from typing import Union, Optional, Dict, Any
 class PDFConverter:
     """
     PDF conversion utility class.
-    
+
     Provides methods to convert Office documents and text files to PDF format.
     """
 
     # Define supported file formats
     OFFICE_FORMATS = {".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx"}
     TEXT_FORMATS = {".txt", ".md"}
-    
+
     # Class-level logger
     logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class PDFConverter:
             # Check if LibreOffice is available
             libreoffice_available = False
             working_libreoffice_cmd: Optional[str] = None
-            
+
             # Prepare subprocess parameters to hide console window on Windows
             subprocess_kwargs: Dict[str, Any] = {
                 "capture_output": True,
@@ -86,8 +86,10 @@ class PDFConverter:
 
             # Hide console window on Windows
             if platform.system() == "Windows":
-                subprocess_kwargs["creationflags"] = 0x08000000  # subprocess.CREATE_NO_WINDOW
-            
+                subprocess_kwargs["creationflags"] = (
+                    0x08000000  # subprocess.CREATE_NO_WINDOW
+                )
+
             try:
                 result = subprocess.run(
                     ["libreoffice", "--version"], **subprocess_kwargs
@@ -171,7 +173,9 @@ class PDFConverter:
 
                         # Hide console window on Windows
                         if platform.system() == "Windows":
-                            convert_subprocess_kwargs["creationflags"] = 0x08000000  # subprocess.CREATE_NO_WINDOW
+                            convert_subprocess_kwargs["creationflags"] = (
+                                0x08000000  # subprocess.CREATE_NO_WINDOW
+                            )
 
                         result = subprocess.run(
                             convert_cmd, **convert_subprocess_kwargs
@@ -538,7 +542,9 @@ class PDFConverter:
             }
 
             if platform.system() == "Windows":
-                subprocess_kwargs["creationflags"] = 0x08000000  # subprocess.CREATE_NO_WINDOW
+                subprocess_kwargs["creationflags"] = (
+                    0x08000000  # subprocess.CREATE_NO_WINDOW
+                )
 
             subprocess.run(["libreoffice", "--version"], **subprocess_kwargs)
             results["libreoffice"] = True
@@ -552,6 +558,7 @@ class PDFConverter:
         # Check ReportLab
         try:
             import reportlab
+
             results["reportlab"] = True
         except ImportError:
             pass
@@ -563,10 +570,8 @@ def main():
     """
     Main function to run the PDF converter from command line
     """
-    parser = argparse.ArgumentParser(
-        description="Convert documents to PDF format"
-    )
-    parser.add_argument("file_path", nargs='?', help="Path to the document to convert")
+    parser = argparse.ArgumentParser(description="Convert documents to PDF format")
+    parser.add_argument("file_path", nargs="?", help="Path to the document to convert")
     parser.add_argument("--output", "-o", help="Output directory path")
     parser.add_argument(
         "--check",
@@ -594,20 +599,22 @@ def main():
     if args.check:
         print("🔍 Checking dependencies...")
         deps = converter.check_dependencies()
-        
-        print(f"LibreOffice: {'✅ Available' if deps['libreoffice'] else '❌ Not found'}")
+
+        print(
+            f"LibreOffice: {'✅ Available' if deps['libreoffice'] else '❌ Not found'}"
+        )
         print(f"ReportLab: {'✅ Available' if deps['reportlab'] else '❌ Not found'}")
-        
-        if not deps['libreoffice']:
+
+        if not deps["libreoffice"]:
             print("\n📋 To install LibreOffice:")
             print("  - Windows: Download from https://www.libreoffice.org/")
             print("  - macOS: brew install --cask libreoffice")
             print("  - Ubuntu/Debian: sudo apt-get install libreoffice")
-            
-        if not deps['reportlab']:
+
+        if not deps["reportlab"]:
             print("\n📋 To install ReportLab:")
             print("  pip install reportlab")
-            
+
         return 0
 
     # If not checking dependencies, file_path is required
@@ -632,4 +639,4 @@ def main():
 
 
 if __name__ == "__main__":
-    exit(main()) 
+    exit(main())
