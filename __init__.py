@@ -8,9 +8,6 @@ DeepCode - AI Research Engine
 __version__ = "1.0.1"
 __author__ = "DeepCode Team"
 __url__ = "https://github.com/HKUDS/DeepCode"
-__description__ = (
-    "AI Research Engine - Transform research papers into working code automatically"
-)
 
 # Import main components for easy access
 from utils import FileProcessor, DialogueLogger

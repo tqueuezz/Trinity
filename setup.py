@@ -62,7 +62,7 @@ setuptools.setup(
     url=metadata["__url__"],
     version=metadata["__version__"],
     author=metadata["__author__"],
-    description=metadata["__description__"],
+    description="AI Research Engine - Transform research papers into working code automatically",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(
