@@ -100,11 +100,10 @@ async def perform_document_conversion(
     if not file_path:
         return None
 
-    conversion_success = False
     conversion_msg = ""
 
     # 首先尝试使用简单的PDF转换器（对于PDF文件）
-    if file_path.lower().endswith(".pdf") and PYPDF2_AVAILABLE and not extract_images:
+    if file_path.lower().endswith(".pdf") and PYPDF2_AVAILABLE:
         try:
             simple_converter = SimplePdfConverter()
             conversion_result = simple_converter.convert_pdf_to_markdown(file_path)
@@ -119,40 +118,40 @@ async def perform_document_conversion(
                 conversion_msg += (
                     f"\n   Pages extracted: {conversion_result['pages_extracted']}"
                 )
-                conversion_success = True
+
             else:
                 conversion_msg = f"\n   [WARNING] PDF conversion failed: {conversion_result['error']}"
         except Exception as conv_error:
             conversion_msg = f"\n   [WARNING] PDF conversion error: {str(conv_error)}"
 
     # 如果简单转换失败，尝试使用docling（支持图片提取）
-    if not conversion_success and DOCLING_AVAILABLE:
-        try:
-            converter = DoclingConverter()
-            if converter.is_supported_format(file_path):
-                conversion_result = converter.convert_to_markdown(
-                    file_path, extract_images=extract_images
-                )
-                if conversion_result["success"]:
-                    conversion_msg = (
-                        "\n   [INFO] Document converted to Markdown (docling)"
-                    )
-                    conversion_msg += (
-                        f"\n   Markdown file: {conversion_result['output_file']}"
-                    )
-                    conversion_msg += f"\n   Conversion time: {conversion_result['duration']:.2f} seconds"
-                    if conversion_result.get("images_extracted", 0) > 0:
-                        conversion_msg += f"\n   Images extracted: {conversion_result['images_extracted']}"
-                        images_dir = os.path.join(
-                            os.path.dirname(conversion_result["output_file"]), "images"
-                        )
-                        conversion_msg += f"\n   Images saved to: {images_dir}"
-                else:
-                    conversion_msg = f"\n   [WARNING] Docling conversion failed: {conversion_result['error']}"
-        except Exception as conv_error:
-            conversion_msg = (
-                f"\n   [WARNING] Docling conversion error: {str(conv_error)}"
-            )
+    # if not conversion_success and DOCLING_AVAILABLE:
+    #     try:
+    #         converter = DoclingConverter()
+    #         if converter.is_supported_format(file_path):
+    #             conversion_result = converter.convert_to_markdown(
+    #                 file_path, extract_images=extract_images
+    #             )
+    #             if conversion_result["success"]:
+    #                 conversion_msg = (
+    #                     "\n   [INFO] Document converted to Markdown (docling)"
+    #                 )
+    #                 conversion_msg += (
+    #                     f"\n   Markdown file: {conversion_result['output_file']}"
+    #                 )
+    #                 conversion_msg += f"\n   Conversion time: {conversion_result['duration']:.2f} seconds"
+    #                 if conversion_result.get("images_extracted", 0) > 0:
+    #                     conversion_msg += f"\n   Images extracted: {conversion_result['images_extracted']}"
+    #                     images_dir = os.path.join(
+    #                         os.path.dirname(conversion_result["output_file"]), "images"
+    #                     )
+    #                     conversion_msg += f"\n   Images saved to: {images_dir}"
+    #             else:
+    #                 conversion_msg = f"\n   [WARNING] Docling conversion failed: {conversion_result['error']}"
+    #     except Exception as conv_error:
+    #         conversion_msg = (
+    #             f"\n   [WARNING] Docling conversion error: {str(conv_error)}"
+    #         )
 
     return conversion_msg if conversion_msg else None
 
@@ -1235,110 +1234,110 @@ async def move_file_to(
         return msg + f"[ERROR] Move failed!\n   Error: {result['error']}"
 
 
-@mcp.tool()
-async def convert_document_to_markdown(
-    file_path: str, output_path: Optional[str] = None, extract_images: bool = True
-) -> str:
-    """
-    Convert a document to Markdown format with image extraction support.
+# @mcp.tool()
+# async def convert_document_to_markdown(
+#     file_path: str, output_path: Optional[str] = None, extract_images: bool = True
+# ) -> str:
+#     """
+#     Convert a document to Markdown format with image extraction support.
 
-    Supports both local files and URLs. Uses docling for advanced conversion with image extraction,
-    or falls back to PyPDF2 for simple PDF text extraction.
+#     Supports both local files and URLs. Uses docling for advanced conversion with image extraction,
+#     or falls back to PyPDF2 for simple PDF text extraction.
 
-    Args:
-        file_path: Path to the input document file or URL (supports PDF, DOCX, PPTX, HTML, TXT, MD)
-        output_path: Path for the output Markdown file (optional, auto-generated if not provided)
-        extract_images: Whether to extract images from the document (default: True)
+#     Args:
+#         file_path: Path to the input document file or URL (supports PDF, DOCX, PPTX, HTML, TXT, MD)
+#         output_path: Path for the output Markdown file (optional, auto-generated if not provided)
+#         extract_images: Whether to extract images from the document (default: True)
 
-    Returns:
-        Status message about the conversion operation with preview of converted content
+#     Returns:
+#         Status message about the conversion operation with preview of converted content
 
-    Examples:
-        - "convert_document_to_markdown('paper.pdf')"
-        - "convert_document_to_markdown('https://example.com/doc.pdf', 'output.md')"
-        - "convert_document_to_markdown('presentation.pptx', extract_images=False)"
-    """
-    # 检查是否为URL
-    is_url_input = False
-    try:
-        parsed = urlparse(file_path)
-        is_url_input = parsed.scheme in ("http", "https")
-    except Exception:
-        is_url_input = False
+#     Examples:
+#         - "convert_document_to_markdown('paper.pdf')"
+#         - "convert_document_to_markdown('https://example.com/doc.pdf', 'output.md')"
+#         - "convert_document_to_markdown('presentation.pptx', extract_images=False)"
+#     """
+#     # 检查是否为URL
+#     is_url_input = False
+#     try:
+#         parsed = urlparse(file_path)
+#         is_url_input = parsed.scheme in ("http", "https")
+#     except Exception:
+#         is_url_input = False
 
-    # 检查文件是否存在（如果不是URL）
-    if not is_url_input and not os.path.exists(file_path):
-        return f"[ERROR] Input file not found: {file_path}"
+#     # 检查文件是否存在（如果不是URL）
+#     if not is_url_input and not os.path.exists(file_path):
+#         return f"[ERROR] Input file not found: {file_path}"
 
-    # 检查是否是PDF文件，优先使用简单转换器（仅对本地文件）
-    if (
-        not is_url_input
-        and file_path.lower().endswith(".pdf")
-        and PYPDF2_AVAILABLE
-        and not extract_images
-    ):
-        try:
-            simple_converter = SimplePdfConverter()
-            result = simple_converter.convert_pdf_to_markdown(file_path, output_path)
-        except Exception as e:
-            return f"[ERROR] PDF conversion error: {str(e)}"
-    elif DOCLING_AVAILABLE:
-        try:
-            converter = DoclingConverter()
+#     # 检查是否是PDF文件，优先使用简单转换器（仅对本地文件）
+#     if (
+#         not is_url_input
+#         and file_path.lower().endswith(".pdf")
+#         and PYPDF2_AVAILABLE
+#         and not extract_images
+#     ):
+#         try:
+#             simple_converter = SimplePdfConverter()
+#             result = simple_converter.convert_pdf_to_markdown(file_path, output_path)
+#         except Exception as e:
+#             return f"[ERROR] PDF conversion error: {str(e)}"
+#     elif DOCLING_AVAILABLE:
+#         try:
+#             converter = DoclingConverter()
 
-            # 检查文件格式是否支持
-            if not is_url_input and not converter.is_supported_format(file_path):
-                supported_formats = [".pdf", ".docx", ".pptx", ".html", ".md", ".txt"]
-                return f"[ERROR] Unsupported file format. Supported formats: {', '.join(supported_formats)}"
-            elif is_url_input and not file_path.lower().endswith(
-                (".pdf", ".docx", ".pptx", ".html", ".md", ".txt")
-            ):
-                return f"[ERROR] Unsupported URL format: {file_path}"
+#             # 检查文件格式是否支持
+#             if not is_url_input and not converter.is_supported_format(file_path):
+#                 supported_formats = [".pdf", ".docx", ".pptx", ".html", ".md", ".txt"]
+#                 return f"[ERROR] Unsupported file format. Supported formats: {', '.join(supported_formats)}"
+#             elif is_url_input and not file_path.lower().endswith(
+#                 (".pdf", ".docx", ".pptx", ".html", ".md", ".txt")
+#             ):
+#                 return f"[ERROR] Unsupported URL format: {file_path}"
 
-            # 执行转换（支持图片提取）
-            result = converter.convert_to_markdown(
-                file_path, output_path, extract_images
-            )
-        except Exception as e:
-            return f"[ERROR] Docling conversion error: {str(e)}"
-    else:
-        return (
-            "[ERROR] No conversion tools available. Please install docling or PyPDF2."
-        )
+#             # 执行转换（支持图片提取）
+#             result = converter.convert_to_markdown(
+#                 file_path, output_path, extract_images
+#             )
+#         except Exception as e:
+#             return f"[ERROR] Docling conversion error: {str(e)}"
+#     else:
+#         return (
+#             "[ERROR] No conversion tools available. Please install docling or PyPDF2."
+#         )
 
-    if result["success"]:
-        msg = "[SUCCESS] Document converted successfully!\n"
-        msg += f"   Input: {result['input_file']}\n"
-        msg += f"   Output file: {result['output_file']}\n"
-        msg += f"   Conversion time: {result['duration']:.2f} seconds\n"
+#     if result["success"]:
+#         msg = "[SUCCESS] Document converted successfully!\n"
+#         msg += f"   Input: {result['input_file']}\n"
+#         msg += f"   Output file: {result['output_file']}\n"
+#         msg += f"   Conversion time: {result['duration']:.2f} seconds\n"
 
-        if result["input_size"] > 0:
-            msg += f"   Original size: {result['input_size'] / 1024:.1f} KB\n"
-        msg += f"   Markdown size: {result['output_size'] / 1024:.1f} KB\n"
+#         if result["input_size"] > 0:
+#             msg += f"   Original size: {result['input_size'] / 1024:.1f} KB\n"
+#         msg += f"   Markdown size: {result['output_size'] / 1024:.1f} KB\n"
 
-        # 显示图片提取信息
-        if extract_images and "images_extracted" in result:
-            images_count = result["images_extracted"]
-            if images_count > 0:
-                msg += f"   Images extracted: {images_count}\n"
-                msg += f"   Images saved to: {os.path.join(os.path.dirname(result['output_file']), 'images')}\n"
-            else:
-                msg += "   No images found in document\n"
+#         # 显示图片提取信息
+#         if extract_images and "images_extracted" in result:
+#             images_count = result["images_extracted"]
+#             if images_count > 0:
+#                 msg += f"   Images extracted: {images_count}\n"
+#                 msg += f"   Images saved to: {os.path.join(os.path.dirname(result['output_file']), 'images')}\n"
+#             else:
+#                 msg += "   No images found in document\n"
 
-        # 显示Markdown内容的前几行作为预览
-        content_lines = result["markdown_content"].split("\n")
-        preview_lines = content_lines[:5]
-        if len(content_lines) > 5:
-            preview_lines.append("...")
+#         # 显示Markdown内容的前几行作为预览
+#         content_lines = result["markdown_content"].split("\n")
+#         preview_lines = content_lines[:5]
+#         if len(content_lines) > 5:
+#             preview_lines.append("...")
 
-        msg += "\n[PREVIEW] First few lines of converted Markdown:\n"
-        for line in preview_lines:
-            msg += f"   {line}\n"
-    else:
-        msg = "[ERROR] Conversion failed!\n"
-        msg += f"   Error: {result['error']}"
+#         msg += "\n[PREVIEW] First few lines of converted Markdown:\n"
+#         for line in preview_lines:
+#             msg += f"   {line}\n"
+#     else:
+#         msg = "[ERROR] Conversion failed!\n"
+#         msg += f"   Error: {result['error']}"
 
-    return msg
+#     return msg
 
 
 if __name__ == "__main__":
