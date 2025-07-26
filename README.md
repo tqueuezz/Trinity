@@ -99,9 +99,9 @@
 
 <div style="margin: 20px 0;">
   <a href="https://youtu.be/PRgmP8pOI08" target="_blank">
-    <img src="https://img.youtube.com/vi/PRgmP8pOI08/maxresdefault.jpg" 
-         alt="DeepCode Introduction Video" 
-         width="75%" 
+    <img src="https://img.youtube.com/vi/PRgmP8pOI08/maxresdefault.jpg"
+         alt="DeepCode Introduction Video"
+         width="75%"
          style="border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: transform 0.3s ease;"/>
   </a>
 </div>
@@ -541,11 +541,11 @@ default_search_server: "brave"
 ```
 
 **Available Options:**
-- **🔍 Brave Search** (`"brave"`): 
+- **🔍 Brave Search** (`"brave"`):
   - Default option with high-quality search results
   - Requires BRAVE_API_KEY configuration
   - Recommended for most users
-  
+
 - **🌐 Bocha-MCP** (`"bocha-mcp"`):
   - Alternative search server
   - No additional API key required
