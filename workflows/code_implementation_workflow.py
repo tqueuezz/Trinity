@@ -598,11 +598,23 @@ Requirements:
                     client = AsyncOpenAI(api_key=openai_key)
 
                 # Test connection with default model from config
-                await client.chat.completions.create(
-                    model=self.default_models["openai"],
-                    max_tokens=10,
-                    messages=[{"role": "user", "content": "test"}],
-                )
+                # Try max_tokens first, fallback to max_completion_tokens if unsupported
+                try:
+                    await client.chat.completions.create(
+                        model=self.default_models["openai"],
+                        max_tokens=10,
+                        messages=[{"role": "user", "content": "test"}],
+                    )
+                except Exception as e:
+                    if "max_tokens" in str(e) and "max_completion_tokens" in str(e):
+                        # Retry with max_completion_tokens for models that require it
+                        await client.chat.completions.create(
+                            model=self.default_models["openai"],
+                            max_completion_tokens=10,
+                            messages=[{"role": "user", "content": "test"}],
+                        )
+                    else:
+                        raise
                 self.logger.info(
                     f"Using OpenAI API with model: {self.default_models['openai']}"
                 )
@@ -691,13 +703,26 @@ Requirements:
         openai_messages = [{"role": "system", "content": system_message}]
         openai_messages.extend(messages)
 
-        response = await client.chat.completions.create(
-            model=self.default_models["openai"],
-            messages=openai_messages,
-            tools=openai_tools if openai_tools else None,
-            max_tokens=max_tokens,
-            temperature=0.2,
-        )
+        # Try max_tokens first, fallback to max_completion_tokens if unsupported
+        try:
+            response = await client.chat.completions.create(
+                model=self.default_models["openai"],
+                messages=openai_messages,
+                tools=openai_tools if openai_tools else None,
+                max_tokens=max_tokens,
+                temperature=0.2,
+            )
+        except Exception as e:
+            if "max_tokens" in str(e) and "max_completion_tokens" in str(e):
+                # Retry with max_completion_tokens for models that require it
+                response = await client.chat.completions.create(
+                    model=self.default_models["openai"],
+                    messages=openai_messages,
+                    tools=openai_tools if openai_tools else None,
+                    max_completion_tokens=max_tokens,
+                )
+            else:
+                raise
 
         message = response.choices[0].message
         content = message.content or ""
