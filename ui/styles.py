@@ -35,21 +35,21 @@ def get_main_styles() -> str:
             --border-color: rgba(100, 181, 246, 0.2);
         }
 
-        /* Light theme variables */
+        /* Light theme variables - Using dark theme colors */
         :root {
-            --light-primary-bg: #f8fafc;
-            --light-secondary-bg: #f1f5f9;
-            --light-accent-bg: #e2e8f0;
-            --light-card-bg: rgba(255, 255, 255, 0.9);
-            --light-border-soft: #cbd5e1;
-            --light-border-medium: #94a3b8;
-            --light-text-primary: #1e293b;
-            --light-text-secondary: #475569;
-            --light-text-muted: #64748b;
-            --light-accent-blue: #3b82f6;
-            --light-accent-cyan: #06b6d4;
-            --light-accent-green: #10b981;
-            --light-accent-purple: #8b5cf6;
+            --light-primary-bg: #0a0e27;
+            --light-secondary-bg: #1a1f3a;
+            --light-accent-bg: #2d3748;
+            --light-card-bg: rgba(45, 55, 72, 0.9);
+            --light-border-soft: rgba(100, 181, 246, 0.2);
+            --light-border-medium: rgba(100, 181, 246, 0.4);
+            --light-text-primary: #ffffff;
+            --light-text-secondary: #e3f2fd;
+            --light-text-muted: #90caf9;
+            --light-accent-blue: #64b5f6;
+            --light-accent-cyan: #4dd0e1;
+            --light-accent-green: #81c784;
+            --light-accent-purple: #ba68c8;
         }
 
         /* Global app background and text */
@@ -2504,6 +2504,86 @@ def get_main_styles() -> str:
                 width: 250px;
                 height: 250px;
             }
+        }
+
+        /* Additional sidebar styles for newer Streamlit versions */
+        /* Cover any new sidebar containers or data-testid selectors */
+        [data-testid="stSidebar"],
+        [data-testid="stSidebarNav"],
+        [data-testid="stSidebarNavItems"],
+        .stSidebar,
+        .sidebar,
+        .sidebar-content,
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #0d1117 0%, #161b22 50%, #21262d 100%) !important;
+            border-right: 2px solid var(--neon-cyan) !important;
+            box-shadow: 0 0 20px rgba(77, 208, 225, 0.3) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Light mode override for new sidebar selectors */
+        @media (prefers-color-scheme: light) {
+            [data-testid="stSidebar"],
+            [data-testid="stSidebarNav"],
+            [data-testid="stSidebarNavItems"],
+            .stSidebar,
+            .sidebar,
+            .sidebar-content,
+            section[data-testid="stSidebar"] {
+                background: linear-gradient(180deg, #0d1117 0%, #161b22 50%, #21262d 100%) !important;
+                border-right: 2px solid var(--neon-cyan) !important;
+                box-shadow: 0 0 20px rgba(77, 208, 225, 0.3) !important;
+                color: var(--text-primary) !important;
+            }
+        }
+
+        /* Alternative light theme detection for new sidebar selectors */
+        [data-theme="light"] [data-testid="stSidebar"],
+        [data-theme="light"] [data-testid="stSidebarNav"],
+        [data-theme="light"] [data-testid="stSidebarNavItems"],
+        [data-theme="light"] .stSidebar,
+        [data-theme="light"] .sidebar,
+        [data-theme="light"] .sidebar-content,
+        [data-theme="light"] section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #0d1117 0%, #161b22 50%, #21262d 100%) !important;
+            border-right: 2px solid var(--neon-cyan) !important;
+            box-shadow: 0 0 20px rgba(77, 208, 225, 0.3) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Force all text in sidebar containers to use dark theme colors */
+        [data-testid="stSidebar"] *,
+        [data-testid="stSidebarNav"] *,
+        [data-testid="stSidebarNavItems"] *,
+        .stSidebar *,
+        .sidebar *,
+        .sidebar-content *,
+        section[data-testid="stSidebar"] * {
+            color: var(--text-primary) !important;
+        }
+
+        /* Light mode: Force all text in sidebar containers to use dark theme colors */
+        @media (prefers-color-scheme: light) {
+            [data-testid="stSidebar"] *,
+            [data-testid="stSidebarNav"] *,
+            [data-testid="stSidebarNavItems"] *,
+            .stSidebar *,
+            .sidebar *,
+            .sidebar-content *,
+            section[data-testid="stSidebar"] * {
+                color: var(--text-primary) !important;
+            }
+        }
+
+        /* Alternative light theme detection for sidebar text */
+        [data-theme="light"] [data-testid="stSidebar"] *,
+        [data-theme="light"] [data-testid="stSidebarNav"] *,
+        [data-theme="light"] [data-testid="stSidebarNavItems"] *,
+        [data-theme="light"] .stSidebar *,
+        [data-theme="light"] .sidebar *,
+        [data-theme="light"] .sidebar-content *,
+        [data-theme="light"] section[data-testid="stSidebar"] * {
+            color: var(--text-primary) !important;
         }
 
     </style>
