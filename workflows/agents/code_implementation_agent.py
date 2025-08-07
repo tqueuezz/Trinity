@@ -297,9 +297,9 @@ class CodeImplementationAgent:
         should_use_summary = False
         if self.memory_agent and self.mcp_agent:
             try:
-                # Use read_code_mem MCP tool to check if summary exists
+                # Use read_code_mem MCP tool to check if summary exists (pass file path as list)
                 read_code_mem_result = await self.mcp_agent.call_tool(
-                    "read_code_mem", {"file_path": file_path}
+                    "read_code_mem", {"file_paths": [file_path]}
                 )
 
                 # Parse the result to check if summary was found
@@ -308,8 +308,10 @@ class CodeImplementationAgent:
                 if isinstance(read_code_mem_result, str):
                     try:
                         result_data = json.loads(read_code_mem_result)
+                        # Check if any summaries were found in the results
                         should_use_summary = (
-                            result_data.get("status") == "summary_found"
+                            result_data.get("status") in ["all_summaries_found", "partial_summaries_found"]
+                            and result_data.get("summaries_found", 0) > 0
                         )
                     except json.JSONDecodeError:
                         should_use_summary = False
@@ -323,7 +325,7 @@ class CodeImplementationAgent:
             # Use the MCP agent to call read_code_mem tool
             if self.mcp_agent:
                 result = await self.mcp_agent.call_tool(
-                    "read_code_mem", {"file_path": file_path}
+                    "read_code_mem", {"file_paths": [file_path]}
                 )
 
                 # Modify the result to indicate it was originally a read_file call
@@ -334,9 +336,25 @@ class CodeImplementationAgent:
                         json.loads(result) if isinstance(result, str) else result
                     )
                     if isinstance(result_data, dict):
-                        result_data["original_tool"] = "read_file"
-                        result_data["optimization"] = "redirected_to_read_code_mem"
-                        final_result = json.dumps(result_data, ensure_ascii=False)
+                        # Extract the specific file result for the single file we requested
+                        file_results = result_data.get("results", [])
+                        if file_results and len(file_results) > 0:
+                            specific_result = file_results[0]  # Get the first (and only) result
+                            # Transform to match the old single-file format for backward compatibility
+                            transformed_result = {
+                                "status": specific_result.get("status", "no_summary"),
+                                "file_path": specific_result.get("file_path", file_path),
+                                "summary_content": specific_result.get("summary_content"),
+                                "message": specific_result.get("message", ""),
+                                "original_tool": "read_file",
+                                "optimization": "redirected_to_read_code_mem"
+                            }
+                            final_result = json.dumps(transformed_result, ensure_ascii=False)
+                        else:
+                            # Fallback if no results
+                            result_data["original_tool"] = "read_file"
+                            result_data["optimization"] = "redirected_to_read_code_mem"
+                            final_result = json.dumps(result_data, ensure_ascii=False)
                     else:
                         final_result = result
                 except (json.JSONDecodeError, TypeError):
@@ -914,7 +932,7 @@ class CodeImplementationAgent:
             if self.mcp_agent:
                 try:
                     result = await self.mcp_agent.call_tool(
-                        "read_code_mem", {"file_path": file_path}
+                        "read_code_mem", {"file_paths": [file_path]}
                     )
 
                     # Parse the result to check if summary was found
@@ -924,7 +942,7 @@ class CodeImplementationAgent:
                         json.loads(result) if isinstance(result, str) else result
                     )
 
-                    if result_data.get("status") == "summary_found":
+                    if result_data.get("status") in ["all_summaries_found", "partial_summaries_found"] and result_data.get("summaries_found", 0) > 0:
                         summary_files_found += 1
                 except Exception as e:
                     self.logger.warning(
@@ -1016,7 +1034,7 @@ class CodeImplementationAgent:
         try:
             # Use MCP agent to call read_code_mem tool
             result = await self.mcp_agent.call_tool(
-                "read_code_mem", {"file_path": test_file_path}
+                "read_code_mem", {"file_paths": [test_file_path]}
             )
 
             # Parse the result to check if summary was found
@@ -1024,7 +1042,7 @@ class CodeImplementationAgent:
 
             result_data = json.loads(result) if isinstance(result, str) else result
 
-            return result_data.get("status") == "summary_found"
+            return result_data.get("status") in ["all_summaries_found", "partial_summaries_found"] and result_data.get("summaries_found", 0) > 0
         except Exception as e:
             self.logger.warning(f"Failed to test read_code_mem optimization: {e}")
             return False

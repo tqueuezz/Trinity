@@ -19,7 +19,7 @@ import sys
 import io
 from pathlib import Path
 import re
-from typing import Dict, Any
+from typing import Dict, Any, List
 import tempfile
 import shutil
 import logging
@@ -418,21 +418,24 @@ async def execute_bash(command: str, timeout: int = 30) -> str:
 
 
 @mcp.tool()
-async def read_code_mem(file_path: str) -> str:
+async def read_code_mem(file_paths: List[str]) -> str:
     """
-    Check if file summary exists in implement_code_summary.md
+    Check if file summaries exist in implement_code_summary.md for multiple files
 
     Args:
-        file_path: File path to check for summary information in implement_code_summary.md
+        file_paths: List of file paths to check for summary information in implement_code_summary.md
 
     Returns:
-        Summary information if available
+        Summary information for all requested files if available
     """
     try:
-        if not file_path:
-            result = {"status": "error", "message": "file_path parameter is required"}
-            log_operation("read_code_mem_error", {"error": "missing_file_path"})
+        if not file_paths or not isinstance(file_paths, list):
+            result = {"status": "error", "message": "file_paths parameter is required and must be a list"}
+            log_operation("read_code_mem_error", {"error": "missing_or_invalid_file_paths"})
             return json.dumps(result, ensure_ascii=False, indent=2)
+
+        # Remove duplicates while preserving order
+        unique_file_paths = list(dict.fromkeys(file_paths))
 
         # Ensure workspace exists
         ensure_workspace_exists()
@@ -444,12 +447,12 @@ async def read_code_mem(file_path: str) -> str:
         if not summary_file_path.exists():
             result = {
                 "status": "no_summary",
-                "file_path": file_path,
+                "file_paths": unique_file_paths,
                 "message": "No summary file found.",
-                # "recommendation": f"read_file(file_path='{file_path}')"
+                "results": []
             }
             log_operation(
-                "read_code_mem", {"file_path": file_path, "status": "no_summary_file"}
+                "read_code_mem", {"file_paths": unique_file_paths, "status": "no_summary_file"}
             )
             return json.dumps(result, ensure_ascii=False, indent=2)
 
@@ -460,54 +463,78 @@ async def read_code_mem(file_path: str) -> str:
         if not summary_content.strip():
             result = {
                 "status": "no_summary",
-                "file_path": file_path,
+                "file_paths": unique_file_paths,
                 "message": "Summary file is empty.",
-                # "recommendation": f"read_file(file_path='{file_path}')"
+                "results": []
             }
             log_operation(
-                "read_code_mem", {"file_path": file_path, "status": "empty_summary"}
+                "read_code_mem", {"file_paths": unique_file_paths, "status": "empty_summary"}
             )
             return json.dumps(result, ensure_ascii=False, indent=2)
 
-        # Extract file-specific section from summary
-        file_section = _extract_file_section_from_summary(summary_content, file_path)
-
-        if file_section:
-            result = {
-                "status": "summary_found",
-                "file_path": file_path,
-                "summary_content": file_section,
-                "message": f"Summary information found for {file_path} in implement_code_summary.md",
-            }
-            log_operation(
-                "read_code_mem",
-                {
+        # Process each file path and collect results
+        results = []
+        summaries_found = 0
+        
+        for file_path in unique_file_paths:
+            # Extract file-specific section from summary
+            file_section = _extract_file_section_from_summary(summary_content, file_path)
+            
+            if file_section:
+                file_result = {
                     "file_path": file_path,
                     "status": "summary_found",
-                    "section_length": len(file_section),
-                },
-            )
-            return json.dumps(result, ensure_ascii=False, indent=2)
+                    "summary_content": file_section,
+                    "message": f"Summary information found for {file_path}"
+                }
+                summaries_found += 1
+            else:
+                file_result = {
+                    "file_path": file_path,
+                    "status": "no_summary",
+                    "summary_content": None,
+                    "message": f"No summary found for {file_path}"
+                }
+            
+            results.append(file_result)
+
+        # Determine overall status
+        if summaries_found == len(unique_file_paths):
+            overall_status = "all_summaries_found"
+        elif summaries_found > 0:
+            overall_status = "partial_summaries_found"
         else:
-            result = {
-                "status": "no_summary",
-                "file_path": file_path,
-                "message": f"No summary found for {file_path} in implement_code_summary.md",
-                # "recommendation": f"Use read_file tool to read the actual file: read_file(file_path='{file_path}')"
-            }
-            log_operation(
-                "read_code_mem", {"file_path": file_path, "status": "no_match"}
-            )
-            return json.dumps(result, ensure_ascii=False, indent=2)
+            overall_status = "no_summaries_found"
+
+        result = {
+            "status": overall_status,
+            "file_paths": unique_file_paths,
+            "total_requested": len(unique_file_paths),
+            "summaries_found": summaries_found,
+            "message": f"Found summaries for {summaries_found}/{len(unique_file_paths)} files",
+            "results": results
+        }
+
+        log_operation(
+            "read_code_mem",
+            {
+                "file_paths": unique_file_paths,
+                "status": overall_status,
+                "total_requested": len(unique_file_paths),
+                "summaries_found": summaries_found,
+            },
+        )
+
+        return json.dumps(result, ensure_ascii=False, indent=2)
 
     except Exception as e:
         result = {
             "status": "error",
             "message": f"Failed to check code memory: {str(e)}",
-            "file_path": file_path,
-            # "recommendation": "Use read_file tool instead"
+            "file_paths": file_paths if isinstance(file_paths, list) else [str(file_paths)],
+            "results": []
         }
-        log_operation("read_code_mem_error", {"file_path": file_path, "error": str(e)})
+        log_operation("read_code_mem_error", {"file_paths": file_paths, "error": str(e)})
         return json.dumps(result, ensure_ascii=False, indent=2)
 
 

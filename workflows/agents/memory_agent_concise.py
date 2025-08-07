@@ -75,6 +75,9 @@ class ConciseMemoryAgent:
         # Parse phase structure from initial plan
         self.phase_structure = self._parse_phase_structure()
 
+        # Extract all files from file structure in initial plan
+        self.all_files_list = self._extract_all_files_from_plan()
+
         # Memory configuration
         if target_directory:
             self.save_path = target_directory
@@ -91,6 +94,9 @@ class ConciseMemoryAgent:
 
         # Track all implemented files
         self.implemented_files = []
+
+        # Store Next Steps information temporarily (not saved to file)
+        self.current_next_steps = ""
 
         self.logger.info(
             f"Concise Memory Agent initialized with target directory: {self.save_path}"
@@ -139,6 +145,204 @@ class ConciseMemoryAgent:
         except Exception as e:
             self.logger.warning(f"Failed to parse phase structure: {e}")
             return {}
+
+    def _extract_all_files_from_plan(self) -> List[str]:
+        """
+        Extract all file paths from the file_structure section in initial plan
+        Handles multiple formats: tree structure, YAML, and simple lists
+        
+        Returns:
+            List of all file paths that should be implemented
+        """
+        try:
+            lines = self.initial_plan.split("\n")
+            files = []
+            
+            # Method 1: Try to extract from tree structure in file_structure section
+            files.extend(self._extract_from_tree_structure(lines))
+            
+            # Method 2: If no files found, try to extract from simple list format
+            if not files:
+                files.extend(self._extract_from_simple_list(lines))
+                
+            # Method 3: If still no files, try to extract from anywhere in the plan
+            if not files:
+                files.extend(self._extract_from_plan_content(lines))
+            
+            # Clean and validate file paths
+            cleaned_files = self._clean_and_validate_files(files)
+            
+            # Log the extracted files
+            self.logger.info(f"📁 Extracted {len(cleaned_files)} files from initial plan")
+            if cleaned_files:
+                self.logger.info(f"📁 Sample files: {cleaned_files[:3]}...")
+            
+            return cleaned_files
+            
+        except Exception as e:
+            self.logger.error(f"Failed to extract files from initial plan: {e}")
+            return []
+
+    def _extract_from_tree_structure(self, lines: List[str]) -> List[str]:
+        """Extract files from tree structure format - only from file_structure section"""
+        files = []
+        in_file_structure = False
+        path_stack = []
+        
+        for line in lines:
+            # Check if we're in the file_structure section
+            if "file_structure:" in line or "file_structure |" in line:
+                in_file_structure = True
+                continue
+            # Check for end of file_structure section (next YAML key)
+            elif in_file_structure and line.strip() and not line.startswith(" ") and ":" in line:
+                # This looks like a new YAML section, stop parsing
+                break
+            elif not in_file_structure:
+                continue
+                
+            if not line.strip():
+                continue
+                
+            # Skip lines that look like YAML keys (contain ":" but not file paths)
+            if ":" in line and not ("." in line and "/" in line):
+                continue
+                
+            # Only process lines that look like file tree structure
+            if not any(char in line for char in ["├", "└", "│", "-"]) and not line.startswith("    "):
+                continue
+                
+            # Remove tree characters and get the clean name
+            clean_line = line
+            for char in ["├──", "└──", "│", "─", "├", "└"]:
+                clean_line = clean_line.replace(char, "")
+            clean_line = clean_line.strip()
+            
+            if not clean_line or ":" in clean_line:
+                continue
+                
+            # Calculate indentation level by counting spaces/tree chars
+            indent_level = 0
+            for char in line:
+                if char in [' ', '\t', '│', '├', '└', '─']:
+                    indent_level += 1
+                else:
+                    break
+            indent_level = max(0, (indent_level - 4) // 4)  # Normalize to directory levels
+            
+            # Extract filename (remove comments)
+            if "#" in clean_line:
+                filename = clean_line.split("#")[0].strip()
+            else:
+                filename = clean_line.strip()
+                
+            # Skip empty filenames
+            if not filename:
+                continue
+                
+            # Update path stack based on indentation
+            if indent_level < len(path_stack):
+                path_stack = path_stack[:indent_level]
+            
+            # If it's a directory (ends with / or no extension), add to path stack
+            if filename.endswith("/") or (not "." in filename and filename != ""):
+                directory_name = filename.rstrip("/")
+                if directory_name and not ":" in directory_name:
+                    path_stack.append(directory_name)
+            else:
+                # It's a file, construct full path
+                if path_stack:
+                    full_path = "/".join(path_stack) + "/" + filename
+                else:
+                    full_path = filename
+                files.append(full_path)
+                    
+        return files
+
+    def _extract_from_simple_list(self, lines: List[str]) -> List[str]:
+        """Extract files from simple list format (- filename)"""
+        files = []
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith("- ") and not line.startswith("- \""):
+                # Remove leading "- " and clean up
+                filename = line[2:].strip()
+                
+                # Remove quotes if present
+                if filename.startswith('"') and filename.endswith('"'):
+                    filename = filename[1:-1]
+                    
+                # Check if it looks like a file (has extension)
+                if "." in filename and "/" in filename:
+                    files.append(filename)
+                    
+        return files
+
+    def _extract_from_plan_content(self, lines: List[str]) -> List[str]:
+        """Extract files from anywhere in the plan content"""
+        files = []
+        
+        # Look for common file patterns
+        import re
+        file_patterns = [
+            r'([a-zA-Z0-9_\-/]+\.[a-zA-Z0-9]+)',  # filename.ext
+            r'"([a-zA-Z0-9_\-/]+\.[a-zA-Z0-9]+)"',  # "filename.ext"
+        ]
+        
+        for line in lines:
+            for pattern in file_patterns:
+                matches = re.findall(pattern, line)
+                for match in matches:
+                    # Only include if it looks like a code file (exclude media files)
+                    if ("/" in match and 
+                        any(ext in match for ext in ['.py', '.js', '.html', '.css', '.md', '.txt', '.json', '.yaml', '.yml', '.xml', '.sql', '.sh', '.ts', '.jsx', '.tsx'])):
+                        files.append(match)
+                        
+        return files
+
+    def _clean_and_validate_files(self, files: List[str]) -> List[str]:
+        """Clean and validate extracted file paths - only keep code files"""
+        cleaned_files = []
+        
+        # Define code file extensions we want to track
+        code_extensions = [
+            '.py', '.js', '.html', '.css', '.md', '.txt', '.json', '.yaml', '.yml',
+            '.xml', '.sql', '.sh', '.bat', '.dockerfile', '.env', '.gitignore',
+            '.ts', '.jsx', '.tsx', '.vue', '.php', '.rb', '.go', '.rs', '.cpp',
+            '.c', '.h', '.hpp', '.java', '.kt', '.swift', '.dart'
+        ]
+        
+        for file_path in files:
+            # Clean the path
+            cleaned_path = file_path.strip().strip('"').strip("'")
+            
+            # Skip if empty
+            if not cleaned_path:
+                continue
+                
+            # Skip directories (no file extension)
+            if not "." in cleaned_path.split("/")[-1]:
+                continue
+                
+            # Only include files with code extensions
+            has_code_extension = any(cleaned_path.lower().endswith(ext) for ext in code_extensions)
+            if not has_code_extension:
+                continue
+                
+            # Skip files that look like YAML keys or config entries
+            if ":" in cleaned_path and not cleaned_path.endswith(".yaml") and not cleaned_path.endswith(".yml"):
+                continue
+                
+            # Skip paths that contain invalid characters for file paths
+            if any(invalid_char in cleaned_path for invalid_char in ['"', "'", "|"]):
+                continue
+                
+            # Add to cleaned list if not already present
+            if cleaned_path not in cleaned_files:
+                cleaned_files.append(cleaned_path)
+                
+        return sorted(cleaned_files)
 
     def record_file_implementation(
         self, file_path: str, implementation_content: str = ""
@@ -195,12 +399,27 @@ class ConciseMemoryAgent:
             )
             llm_summary = llm_response.get("content", "")
 
-            # Format the summary in the requested structure
+            # Extract different sections from LLM summary
+            sections = self._extract_summary_sections(llm_summary)
+            
+            # Store Next Steps in temporary variable (not saved to file)
+            self.current_next_steps = sections.get("next_steps", "")
+            if self.current_next_steps:
+                self.logger.info(f"📝 Next Steps stored temporarily (not saved to file)")
+            
+            # Format summary with only Implementation Progress and Dependencies for file saving
+            file_summary_content = ""
+            if sections.get("implementation_progress"):
+                file_summary_content += sections["implementation_progress"] + "\n\n"
+            if sections.get("dependencies"):
+                file_summary_content += sections["dependencies"] + "\n\n"
+            
+            # Create the formatted summary for file saving (without Next Steps)
             formatted_summary = self._format_code_implementation_summary(
-                file_path, llm_summary, files_implemented
+                file_path, file_summary_content.strip(), files_implemented
             )
 
-            # Save to implement_code_summary.md (append mode)
+            # Save to implement_code_summary.md (append mode) - only Implementation Progress and Dependencies
             await self._save_code_summary_to_file(formatted_summary, file_path)
 
             self.logger.info(f"Created and saved code summary for: {file_path}")
@@ -231,12 +450,10 @@ class ConciseMemoryAgent:
         """
         current_round = self.current_round
 
-        # Create formatted list of implemented files
-        implemented_files_list = (
-            "\n".join([f"- {file}" for file in self.implemented_files])
-            if self.implemented_files
-            else "- None yet"
-        )
+        # Get formatted file lists  
+        file_lists = self.get_formatted_files_lists()
+        implemented_files_list = file_lists["implemented"]
+        unimplemented_files_list = file_lists["unimplemented"]
 
         prompt = f"""You are an expert code implementation summarizer. Analyze the implemented code file and create a structured summary.
 
@@ -244,6 +461,9 @@ class ConciseMemoryAgent:
 
 **All Previously Implemented Files:**
 {implemented_files_list}
+
+**Remaining Unimplemented Files (choose ONLY from these for Next Steps):**
+{unimplemented_files_list}
 
 **Current Implementation Context:**
 - **File Implemented**: {file_path}
@@ -261,32 +481,87 @@ class ConciseMemoryAgent:
 
 **Required Summary Format:**
 
-1. **Status Marker**: Mark the phase and round corresponding to this code file
-   Format: Phase {{phase_name}}, Round {{round_number}}
+**Implementation Progress**: List the code file completed in current round and core implementation ideas
+  Format: {{file_path}}: {{core implementation ideas}}
 
-2. **Implementation Progress**: List the code file completed in current round and core implementation ideas
-   Format: {{file_path}}: {{core implementation ideas}}
+**Dependencies**: According to the File Structure and initial plan, list functions that may be called by other files
+  Format: {{file_path}}: Function {{function_name}}: core ideas--{{ideas}}; Required parameters--{{params}}; Return parameters--{{returns}}
+  Required packages: {{packages}}
 
-3. **Dependencies**: According to the File Structure and initial plan, list functions that may be called by other files
-   Format: {{file_path}}: Function {{function_name}}: core ideas--{{ideas}}; Required parameters--{{params}}; Return parameters--{{returns}}
-   Required packages: {{packages}}
-
-4. **Next Steps**: List code files that will be implemented in the next round (EXCLUDE already implemented files)
-   Format: Code will be implemented: {{file_path}}; will stay on Phase {{phase}}/ will go to Phase {{next_phase}}
-   **WARNING: Do NOT suggest any file from the "All Previously Implemented Files" list above!**
+**Next Steps**: List the code file (ONLY ONE) that will be implemented in the next round (MUST choose from "Remaining Unimplemented Files" above)
+  Format: Code will be implemented: {{file_path}}
+  **NEVER suggest any file from the "All Previously Implemented Files" list!**
 
 **Instructions:**
 - Be precise and concise
 - Focus on function interfaces that other files will need
 - Extract actual function signatures from the code
-- **CRITICAL: For Next Steps, ONLY suggest files that are NOT in the "All Previously Implemented Files" list above**
+- **CRITICAL: For Next Steps, ONLY choose ONE file from the "Remaining Unimplemented Files" list above**
 - **NEVER suggest implementing a file that is already in the implemented files list**
-- Predict next implementation steps based on the initial plan but exclude already completed files
+- Choose the next file based on logical dependencies and implementation order
 - Use the exact format specified above
 
 **Summary:**"""
 
         return prompt
+
+    def _extract_summary_sections(self, llm_summary: str) -> Dict[str, str]:
+        """
+        Extract different sections from LLM-generated summary
+        
+        Args:
+            llm_summary: Raw LLM-generated summary text
+            
+        Returns:
+            Dictionary with extracted sections: implementation_progress, dependencies, next_steps
+        """
+        sections = {
+            "implementation_progress": "",
+            "dependencies": "",
+            "next_steps": ""
+        }
+        
+        try:
+            lines = llm_summary.split('\n')
+            current_section = None
+            current_content = []
+            
+            for line in lines:
+                line_lower = line.lower().strip()
+                
+                # Check for section headers
+                if 'implementation progress' in line_lower:
+                    if current_section and current_content:
+                        sections[current_section] = '\n'.join(current_content).strip()
+                    current_section = "implementation_progress"
+                    current_content = [line]  # Include the header
+                elif 'dependencies' in line_lower and not 'implementation' in line_lower:
+                    if current_section and current_content:
+                        sections[current_section] = '\n'.join(current_content).strip()
+                    current_section = "dependencies"
+                    current_content = [line]  # Include the header
+                elif 'next steps' in line_lower:
+                    if current_section and current_content:
+                        sections[current_section] = '\n'.join(current_content).strip()
+                    current_section = "next_steps"
+                    current_content = [line]  # Include the header
+                else:
+                    # Add content to current section
+                    if current_section:
+                        current_content.append(line)
+            
+            # Don't forget the last section
+            if current_section and current_content:
+                sections[current_section] = '\n'.join(current_content).strip()
+                
+            self.logger.info(f"📋 Extracted sections: {list(sections.keys())}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to extract summary sections: {e}")
+            # Fallback: put everything in implementation_progress
+            sections["implementation_progress"] = llm_summary
+            
+        return sections
 
     def _format_code_implementation_summary(
         self, file_path: str, llm_summary: str, files_implemented: int
@@ -311,12 +586,21 @@ class ConciseMemoryAgent:
             else "- None yet"
         )
 
+#         formatted_summary = f"""# Code Implementation Summary
+# **All Previously Implemented Files:**
+# {implemented_files_list}
+# **Generated**: {timestamp}
+# **File Implemented**: {file_path}
+# **Total Files Implemented**: {files_implemented}
+
+# {llm_summary}
+
+# ---
+# *Auto-generated by Memory Agent*
+# """
         formatted_summary = f"""# Code Implementation Summary
-**All Previously Implemented Files:**
-{implemented_files_list}
 **Generated**: {timestamp}
 **File Implemented**: {file_path}
-**Total Files Implemented**: {files_implemented}
 
 {llm_summary}
 
@@ -528,7 +812,7 @@ class ConciseMemoryAgent:
         return self.last_write_file_detected
 
     def create_concise_messages(
-        self, system_prompt: str, messages: List[Dict[str, Any]], files_implemented: int
+        self, system_prompt: str, messages: List[Dict[str, Any]], files_implemented: int, 
     ) -> List[Dict[str, Any]]:
         """
         Create concise message list for LLM input
@@ -556,6 +840,12 @@ class ConciseMemoryAgent:
 
         concise_messages = []
 
+        # Get formatted file lists
+        file_lists = self.get_formatted_files_lists()
+        implemented_files_list = file_lists["implemented"]
+        unimplemented_files_list = file_lists["unimplemented"]
+        
+
         # 1. Add initial plan message (always preserved)
         initial_plan_message = {
             "role": "user",
@@ -566,11 +856,29 @@ class ConciseMemoryAgent:
 
 **Working Directory:** Current workspace
 
+**All Previously Implemented Files:**
+{implemented_files_list}
+
 **Current Status:** {files_implemented} files implemented
 
 **Objective:** Continue implementation by analyzing dependencies and implementing the next required file according to the plan's priority order.""",
         }
+
+        # Append Next Steps information if available
+        if self.current_next_steps.strip():
+            initial_plan_message["content"] += f"\n\n**Next Steps (from previous analysis):**\n{self.current_next_steps}"
+
+        # Debug output for unimplemented files (clean format without dashes)
+        unimplemented_files = self.get_unimplemented_files()
+        print("✅ Unimplemented Files:")
+        for file_path in unimplemented_files:
+            print(f"{file_path}")
+        if self.current_next_steps.strip():
+            print(f"\n📋 {self.current_next_steps}")
+
         concise_messages.append(initial_plan_message)
+
+
 
         # 2. Add Knowledge Base
         knowledge_base_message = {
@@ -593,6 +901,11 @@ class ConciseMemoryAgent:
         # 3. Add current tool results (essential information for next file generation)
         if self.current_round_tool_results:
             tool_results_content = self._format_tool_results()
+            
+            # # Append Next Steps information if available
+            # if self.current_next_steps.strip():
+            #     tool_results_content += f"\n\n**Next Steps (from previous analysis):**\n{self.current_next_steps}"
+            
             tool_results_message = {
                 "role": "user",
                 "content": f"""**Current Tool Results:**
@@ -601,9 +914,7 @@ class ConciseMemoryAgent:
             concise_messages.append(tool_results_message)
         else:
             # If no tool results yet, add guidance for next steps
-            guidance_message = {
-                "role": "user",
-                "content": f"""**Current Round:** {self.current_round}
+            guidance_content = f"""**Current Round:** {self.current_round}
 
 **Development Cycle - START HERE:**
 
@@ -613,7 +924,15 @@ class ConciseMemoryAgent:
 3. Finally: Use execute_python or execute_bash for testing (if needed)
 
 **When all files implemented:**
-1. **Use execute_python or execute_bash** to test the complete implementation""",
+1. **Use execute_python or execute_bash** to test the complete implementation"""
+
+            # # Append Next Steps information if available (even when no tool results)
+            # if self.current_next_steps.strip():
+            #     guidance_content += f"\n\n**Next Steps (from previous analysis):**\n{self.current_next_steps}"
+
+            guidance_message = {
+                "role": "user",
+                "content": guidance_content,
             }
             concise_messages.append(guidance_message)
         # **Available Essential Tools:** read_code_mem, write_file, execute_python, execute_bash
@@ -809,6 +1128,7 @@ class ConciseMemoryAgent:
 
     def get_memory_statistics(self, files_implemented: int = 0) -> Dict[str, Any]:
         """Get memory agent statistics"""
+        unimplemented_files = self.get_unimplemented_files()
         return {
             "last_write_file_detected": self.last_write_file_detected,
             "should_clear_memory_next": self.should_clear_memory_next,
@@ -821,11 +1141,75 @@ class ConciseMemoryAgent:
             "implemented_files_tracked": files_implemented,
             "implemented_files_list": self.implemented_files.copy(),
             "phases_parsed": len(self.phase_structure),
+            "next_steps_available": bool(self.current_next_steps.strip()),
+            "next_steps_length": len(self.current_next_steps.strip()) if self.current_next_steps else 0,
+            # File tracking statistics
+            "total_files_in_plan": len(self.all_files_list),
+            "files_implemented_count": len(self.implemented_files),
+            "files_remaining_count": len(unimplemented_files),
+            "all_files_list": self.all_files_list.copy(),
+            "unimplemented_files_list": unimplemented_files,
+            "implementation_progress_percent": (len(self.implemented_files) / len(self.all_files_list) * 100) if self.all_files_list else 0,
         }
 
     def get_implemented_files(self) -> List[str]:
         """Get list of all implemented files"""
         return self.implemented_files.copy()
+
+    def get_all_files_list(self) -> List[str]:
+        """Get list of all files that should be implemented according to the plan"""
+        return self.all_files_list.copy()
+
+    def get_unimplemented_files(self) -> List[str]:
+        """
+        Get list of files that haven't been implemented yet
+        
+        Returns:
+            List of file paths that still need to be implemented
+        """
+        implemented_set = set(self.implemented_files)
+        unimplemented = [f for f in self.all_files_list if f not in implemented_set]
+        return unimplemented
+
+    def get_formatted_files_lists(self) -> Dict[str, str]:
+        """
+        Get formatted strings for implemented and unimplemented files
+        
+        Returns:
+            Dictionary with 'implemented' and 'unimplemented' formatted lists
+        """
+        implemented_list = (
+            "\n".join([f"- {file}" for file in self.implemented_files])
+            if self.implemented_files
+            else "- None yet"
+        )
+        
+        unimplemented_files = self.get_unimplemented_files()
+        unimplemented_list = (
+            "\n".join([f"- {file}" for file in unimplemented_files])
+            if unimplemented_files
+            else "- All files implemented!"
+        )
+        
+        return {
+            "implemented": implemented_list,
+            "unimplemented": unimplemented_list
+        }
+
+    def get_current_next_steps(self) -> str:
+        """Get the current Next Steps information"""
+        return self.current_next_steps
+
+    def clear_next_steps(self):
+        """Clear the stored Next Steps information"""
+        if self.current_next_steps.strip():
+            self.logger.info("🧹 Next Steps information cleared")
+        self.current_next_steps = ""
+
+    def set_next_steps(self, next_steps: str):
+        """Manually set Next Steps information"""
+        self.current_next_steps = next_steps
+        self.logger.info(f"📝 Next Steps manually set ({len(next_steps.strip())} chars)")
 
     def should_trigger_memory_optimization(
         self, messages: List[Dict[str, Any]], files_implemented: int = 0
@@ -910,10 +1294,24 @@ class ConciseMemoryAgent:
         print(f"Implemented files tracked: {len(self.implemented_files)}")
         print(f"Implemented files list: {self.implemented_files}")
         print(f"Code summary file exists: {os.path.exists(self.code_summary_path)}")
+        print(f"Next Steps available: {stats['next_steps_available']}")
+        print(f"Next Steps length: {stats['next_steps_length']} chars")
+        if self.current_next_steps.strip():
+            print(f"Next Steps preview: {self.current_next_steps[:100]}...")
+        print("")
+        print("📋 FILE TRACKING:")
+        print(f"  Total files in plan: {stats['total_files_in_plan']}")
+        print(f"  Files implemented: {stats['files_implemented_count']}")
+        print(f"  Files remaining: {stats['files_remaining_count']}")
+        print(f"  Progress: {stats['implementation_progress_percent']:.1f}%")
+        if stats['unimplemented_files_list']:
+            print(f"  Next possible files: {stats['unimplemented_files_list'][:3]}...")
         print("")
         print(
             "📊 NEW LOGIC: write_file → clear memory → accumulate tools → next write_file"
         )
+        print("📊 NEXT STEPS: Stored separately from file, included in tool results")
+        print("📊 FILE TRACKING: All files extracted from plan, unimplemented files guide LLM decisions")
         print("📊 Essential Tools Tracked:")
         essential_tools = [
             "read_code_mem",

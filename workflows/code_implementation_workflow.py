@@ -91,10 +91,14 @@ def get_default_models(config_path: str = "mcp_agent.config.yaml"):
             with open(config_path, "r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
 
-            anthropic_model = config.get("anthropic", {}).get(
+            # Handle null values in config sections
+            anthropic_config = config.get("anthropic") or {}
+            openai_config = config.get("openai") or {}
+            
+            anthropic_model = anthropic_config.get(
                 "default_model", "claude-sonnet-4-20250514"
             )
-            openai_model = config.get("openai", {}).get("default_model", "o3-mini")
+            openai_model = openai_config.get("default_model", "o3-mini")
 
             return {"anthropic": anthropic_model, "openai": openai_model}
         else:
@@ -102,7 +106,7 @@ def get_default_models(config_path: str = "mcp_agent.config.yaml"):
             return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
 
     except Exception as e:
-        print(f"Error reading config file {config_path}: {e}")
+        print(f"❌Error reading config file {config_path}: {e}")
         return {"anthropic": "claude-sonnet-4-20250514", "openai": "o3-mini"}
 
 
@@ -573,7 +577,7 @@ Requirements:
                 # Test connection with default model from config
                 await client.messages.create(
                     model=self.default_models["anthropic"],
-                    max_tokens=10,
+                    max_tokens=20,
                     messages=[{"role": "user", "content": "test"}],
                 )
                 self.logger.info(
@@ -602,7 +606,7 @@ Requirements:
                 try:
                     await client.chat.completions.create(
                         model=self.default_models["openai"],
-                        max_tokens=10,
+                        max_tokens=20,
                         messages=[{"role": "user", "content": "test"}],
                     )
                 except Exception as e:
@@ -610,7 +614,7 @@ Requirements:
                         # Retry with max_completion_tokens for models that require it
                         await client.chat.completions.create(
                             model=self.default_models["openai"],
-                            max_completion_tokens=10,
+                            max_completion_tokens=20,
                             messages=[{"role": "user", "content": "test"}],
                         )
                     else:
