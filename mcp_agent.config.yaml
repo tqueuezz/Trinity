@@ -2,13 +2,20 @@ $schema: ./schema/mcp-agent.config.schema.json
 
 # Default search server configuration
 # Options: "brave" or "bocha-mcp"
-default_search_server: "bocha-mcp"
+default_search_server: "brave"
 
 # Planning mode configuration
 # Options: "segmented" or "traditional"
 # segmented: Breaks down large tasks to avoid token truncation (recommended)
 # traditional: Uses parallel agents but may hit token limits
 planning_mode: "traditional"
+
+# Document segmentation configuration
+document_segmentation:
+  enabled: false  # Whether to use intelligent document segmentation
+  size_threshold_chars: 50000  # Document size threshold (in characters) to trigger segmentation
+  # If document size > threshold and enabled=true, use segmentation workflow
+  # If document size <= threshold or enabled=false, use traditional full-document reading
 
 execution_engine: asyncio
 logger:
@@ -79,6 +86,12 @@ mcp:
       env:
         PYTHONPATH: "."
         BOCHA_API_KEY: ""
+    document-segmentation:
+      command: "python"
+      args: ["tools/document_segmentation_server.py"]
+      env:
+        PYTHONPATH: "."
+      description: "Document segmentation server - Provides intelligent document analysis and segmented reading to optimize token usage"
 
 openai:
   # Secrets (API keys, etc.) are stored in an mcp_agent.secrets.yaml file which can be gitignored

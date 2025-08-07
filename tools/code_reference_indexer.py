@@ -201,15 +201,24 @@ def find_direct_relationships_in_cache(
     """Find direct relationships with target file from provided cache"""
     relationships = []
 
-    # Normalize target file path (remove rice/ prefix if exists)
-    normalized_target = target_file.replace("rice/", "").strip("/")
+    # Normalize target file path (remove common prefixes if exists)
+    common_prefixes = ["src/", "core/", "lib/", "main/", "./"]
+    normalized_target = target_file.strip("/")
+    for prefix in common_prefixes:
+        if normalized_target.startswith(prefix):
+            normalized_target = normalized_target[len(prefix) :]
+            break
 
     # Collect relationship information from all index files
     for repo_name, index_data in index_cache.items():
         repo_relationships = extract_relationships(index_data)
         for rel in repo_relationships:
             # Normalize target file path in relationship
-            normalized_rel_target = rel.target_file_path.replace("rice/", "").strip("/")
+            normalized_rel_target = rel.target_file_path.strip("/")
+            for prefix in common_prefixes:
+                if normalized_rel_target.startswith(prefix):
+                    normalized_rel_target = normalized_rel_target[len(prefix) :]
+                    break
 
             # Check target file path matching (support multiple matching methods)
             if (

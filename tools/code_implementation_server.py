@@ -571,7 +571,7 @@ def _normalize_file_path(file_path: str) -> str:
     normalized = normalized.replace("\\", "/")
 
     # Remove common prefixes to make matching more flexible
-    common_prefixes = ["rice/", "src/", "./rice/", "./src/", "./"]
+    common_prefixes = ["src/", "./src/", "./", "core/", "lib/", "main/"]
     for prefix in common_prefixes:
         if normalized.startswith(prefix):
             normalized = normalized[len(prefix) :]
@@ -621,7 +621,7 @@ def _paths_match(
 
 def _remove_common_prefixes(file_path: str) -> str:
     """Remove common prefixes from file path"""
-    prefixes_to_remove = ["rice/", "src/", "core/", "./"]
+    prefixes_to_remove = ["src/", "core/", "./", "lib/", "main/"]
     path = file_path
 
     for prefix in prefixes_to_remove:

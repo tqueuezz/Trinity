@@ -97,9 +97,9 @@ class CodebaseIndexWorkflow:
 
         # Fallback: look for any code block containing project structure
         code_block_patterns = [
-            r"```[^\n]*\n(rice_framework/.*?(?:├──|└──).*?)\n```",
             r"```[^\n]*\n(project/.*?(?:├──|└──).*?)\n```",
             r"```[^\n]*\n(src/.*?(?:├──|└──).*?)\n```",
+            r"```[^\n]*\n(core/.*?(?:├──|└──).*?)\n```",
             r"```[^\n]*\n(.*?(?:├──|└──).*?(?:\.py|\.txt|\.md|\.yaml).*?)\n```",
         ]
 
@@ -146,12 +146,15 @@ class CodebaseIndexWorkflow:
             # Create tree structure
             structure_lines = []
 
-            # Determine root directory name
-            root_name = (
-                "rice_framework"
-                if any("rice" in f for f in file_mentions)
-                else "project"
-            )
+            # Determine root directory name from common patterns
+            if any("src/" in f for f in file_mentions):
+                root_name = "src"
+            elif any("core/" in f for f in file_mentions):
+                root_name = "core"
+            elif any("lib/" in f for f in file_mentions):
+                root_name = "lib"
+            else:
+                root_name = "project"
             structure_lines.append(f"{root_name}/")
 
             # Add directories and files

@@ -31,12 +31,10 @@ import json
 import os
 import re
 import yaml
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # MCP Agent imports
 from mcp_agent.agents.agent import Agent
-from mcp_agent.workflows.llm.augmented_llm_anthropic import AnthropicAugmentedLLM
-from mcp_agent.workflows.llm.augmented_llm_openai import OpenAIAugmentedLLM
 from mcp_agent.workflows.llm.augmented_llm import RequestParams
 from mcp_agent.workflows.parallel.parallel_llm import ParallelLLM
 
@@ -45,9 +43,6 @@ from prompts.code_prompts import (
     PAPER_INPUT_ANALYZER_PROMPT,
     PAPER_DOWNLOADER_PROMPT,
     PAPER_REFERENCE_ANALYZER_PROMPT,
-    PAPER_ALGORITHM_ANALYSIS_PROMPT,
-    PAPER_CONCEPT_ANALYSIS_PROMPT,
-    CODE_PLANNING_PROMPT,
     CHAT_AGENT_PLANNING_PROMPT,
 )
 from utils.file_processor import FileProcessor
@@ -55,48 +50,16 @@ from workflows.code_implementation_workflow import CodeImplementationWorkflow
 from workflows.code_implementation_workflow_index import (
     CodeImplementationWorkflowWithIndex,
 )
+from utils.llm_utils import (
+    get_preferred_llm_class,
+    should_use_document_segmentation,
+    get_adaptive_agent_config,
+    get_adaptive_prompts,
+)
+from workflows.agents.document_segmentation_agent import prepare_document_segments
 
 # Environment configuration
 os.environ["PYTHONDONTWRITEBYTECODE"] = "1"  # Prevent .pyc file generation
-
-
-def get_preferred_llm_class(config_path: str = "mcp_agent.secrets.yaml"):
-    """
-    Automatically select the LLM class based on API key availability in configuration.
-
-    Reads from YAML config file and returns AnthropicAugmentedLLM if anthropic.api_key
-    is available, otherwise returns OpenAIAugmentedLLM.
-
-    Args:
-        config_path: Path to the YAML configuration file
-
-    Returns:
-        class: The preferred LLM class
-    """
-    try:
-        # Try to read the configuration file
-        if os.path.exists(config_path):
-            with open(config_path, "r", encoding="utf-8") as f:
-                config = yaml.safe_load(f)
-
-            # Check for anthropic API key in config
-            anthropic_config = config.get("anthropic", {})
-            anthropic_key = anthropic_config.get("api_key", "")
-
-            if anthropic_key and anthropic_key.strip() and not anthropic_key == "":
-                # print("🤖 Using AnthropicAugmentedLLM (Anthropic API key found in config)")
-                return AnthropicAugmentedLLM
-            else:
-                # print("🤖 Using OpenAIAugmentedLLM (Anthropic API key not configured)")
-                return OpenAIAugmentedLLM
-        else:
-            print(f"🤖 Config file {config_path} not found, using OpenAIAugmentedLLM")
-            return OpenAIAugmentedLLM
-
-    except Exception as e:
-        print(f"🤖 Error reading config file {config_path}: {e}")
-        print("🤖 Falling back to OpenAIAugmentedLLM")
-        return OpenAIAugmentedLLM
 
 
 def get_default_search_server(config_path: str = "mcp_agent.config.yaml"):
@@ -368,11 +331,13 @@ async def run_resource_processor(analysis_result: str, logger) -> str:
         )
 
 
-async def run_code_analyzer(paper_dir: str, logger) -> str:
+async def run_code_analyzer(
+    paper_dir: str, logger, use_segmentation: bool = True
+) -> str:
     """
-    Run the code analysis workflow using multiple agents for comprehensive code planning.
+    Run the adaptive code analysis workflow using multiple agents for comprehensive code planning.
 
-    This function orchestrates three specialized agents:
+    This function orchestrates three specialized agents with adaptive configuration:
     - ConceptAnalysisAgent: Analyzes system architecture and conceptual framework
     - AlgorithmAnalysisAgent: Extracts algorithms, formulas, and technical details
     - CodePlannerAgent: Integrates outputs into a comprehensive implementation plan
@@ -380,24 +345,35 @@ async def run_code_analyzer(paper_dir: str, logger) -> str:
     Args:
         paper_dir: Directory path containing the research paper and related resources
         logger: Logger instance for logging information
+        use_segmentation: Whether to use document segmentation capabilities
 
     Returns:
         str: Comprehensive analysis result from the coordinated agents
     """
+    # Get adaptive configuration based on segmentation usage
+    search_server_names = get_search_server_names()
+    agent_config = get_adaptive_agent_config(use_segmentation, search_server_names)
+    prompts = get_adaptive_prompts(use_segmentation)
+
+    print(
+        f"📊 Code analysis mode: {'Segmented' if use_segmentation else 'Traditional'}"
+    )
+    print(f"   Agent configurations: {agent_config}")
+
     concept_analysis_agent = Agent(
         name="ConceptAnalysisAgent",
-        instruction=PAPER_CONCEPT_ANALYSIS_PROMPT,
-        server_names=["filesystem"],
+        instruction=prompts["concept_analysis"],
+        server_names=agent_config["concept_analysis"],
     )
     algorithm_analysis_agent = Agent(
         name="AlgorithmAnalysisAgent",
-        instruction=PAPER_ALGORITHM_ANALYSIS_PROMPT,
-        server_names=get_search_server_names(additional_servers=["filesystem"]),
+        instruction=prompts["algorithm_analysis"],
+        server_names=agent_config["algorithm_analysis"],
     )
     code_planner_agent = Agent(
         name="CodePlannerAgent",
-        instruction=CODE_PLANNING_PROMPT,
-        server_names=get_search_server_names(),
+        instruction=prompts["code_planning"],
+        server_names=agent_config["code_planner"],
     )
 
     code_aggregator_agent = ParallelLLM(
@@ -640,6 +616,140 @@ async def orchestrate_reference_intelligence_agent(
     return reference_result
 
 
+async def orchestrate_document_preprocessing_agent(
+    dir_info: Dict[str, str], logger
+) -> Dict[str, Any]:
+    """
+    Orchestrate adaptive document preprocessing with intelligent segmentation control.
+
+    This agent autonomously determines whether to use document segmentation based on
+    configuration settings and document size, then applies the appropriate processing strategy.
+
+    Args:
+        dir_info: Workspace infrastructure metadata
+        logger: Logger instance for preprocessing tracking
+
+    Returns:
+        dict: Document preprocessing result with segmentation metadata
+    """
+
+    try:
+        print("🔍 Starting adaptive document preprocessing...")
+        print(f"   Paper directory: {dir_info['paper_dir']}")
+
+        # Step 1: Check if any markdown files exist
+        md_files = []
+        try:
+            md_files = [
+                f for f in os.listdir(dir_info["paper_dir"]) if f.endswith(".md")
+            ]
+        except Exception as e:
+            print(f"⚠️ Error reading paper directory: {e}")
+
+        if not md_files:
+            print("ℹ️ No markdown files found - skipping document preprocessing")
+            dir_info["segments_ready"] = False
+            dir_info["use_segmentation"] = False
+            return {
+                "status": "skipped",
+                "reason": "no_markdown_files",
+                "paper_dir": dir_info["paper_dir"],
+                "segments_ready": False,
+                "use_segmentation": False,
+            }
+
+        # Step 2: Read document content to determine size
+        md_path = os.path.join(dir_info["paper_dir"], md_files[0])
+        try:
+            with open(md_path, "r", encoding="utf-8") as f:
+                document_content = f.read()
+        except Exception as e:
+            print(f"⚠️ Error reading document content: {e}")
+            dir_info["segments_ready"] = False
+            dir_info["use_segmentation"] = False
+            return {
+                "status": "error",
+                "error_message": f"Failed to read document: {str(e)}",
+                "paper_dir": dir_info["paper_dir"],
+                "segments_ready": False,
+                "use_segmentation": False,
+            }
+
+        # Step 3: Determine if segmentation should be used
+        should_segment, reason = should_use_document_segmentation(document_content)
+        print(f"📊 Segmentation decision: {should_segment}")
+        print(f"   Reason: {reason}")
+
+        # Store decision in dir_info for downstream agents
+        dir_info["use_segmentation"] = should_segment
+
+        if should_segment:
+            print("🔧 Using intelligent document segmentation workflow...")
+
+            # Prepare document segments using the segmentation agent
+            segmentation_result = await prepare_document_segments(
+                paper_dir=dir_info["paper_dir"], logger=logger
+            )
+
+            if segmentation_result["status"] == "success":
+                print("✅ Document segmentation completed successfully!")
+                print(f"   Segments directory: {segmentation_result['segments_dir']}")
+                print("   🧠 Intelligent segments ready for planning agents")
+
+                # Add segment information to dir_info for downstream agents
+                dir_info["segments_dir"] = segmentation_result["segments_dir"]
+                dir_info["segments_ready"] = True
+
+                return segmentation_result
+
+            else:
+                print(
+                    f"⚠️ Document segmentation failed: {segmentation_result.get('error_message', 'Unknown error')}"
+                )
+                print("   Falling back to traditional full-document processing...")
+                dir_info["segments_ready"] = False
+                dir_info["use_segmentation"] = False
+
+                return {
+                    "status": "fallback_to_traditional",
+                    "original_error": segmentation_result.get(
+                        "error_message", "Unknown error"
+                    ),
+                    "paper_dir": dir_info["paper_dir"],
+                    "segments_ready": False,
+                    "use_segmentation": False,
+                    "fallback_reason": "segmentation_failed",
+                }
+        else:
+            print("📖 Using traditional full-document reading workflow...")
+            dir_info["segments_ready"] = False
+
+            return {
+                "status": "traditional",
+                "reason": reason,
+                "paper_dir": dir_info["paper_dir"],
+                "segments_ready": False,
+                "use_segmentation": False,
+                "document_size": len(document_content),
+            }
+
+    except Exception as e:
+        print(f"❌ Error during document preprocessing: {e}")
+        print("   Continuing with traditional full-document processing...")
+
+        # Ensure fallback settings
+        dir_info["segments_ready"] = False
+        dir_info["use_segmentation"] = False
+
+        return {
+            "status": "error",
+            "paper_dir": dir_info["paper_dir"],
+            "segments_ready": False,
+            "use_segmentation": False,
+            "error_message": str(e),
+        }
+
+
 async def orchestrate_code_planning_agent(
     dir_info: Dict[str, str], logger, progress_callback: Optional[Callable] = None
 ):
@@ -661,7 +771,13 @@ async def orchestrate_code_planning_agent(
 
     # Check if initial plan already exists
     if not os.path.exists(initial_plan_path):
-        initial_plan_result = await run_code_analyzer(dir_info["paper_dir"], logger)
+        # Use segmentation setting from preprocessing phase
+        use_segmentation = dir_info.get("use_segmentation", True)
+        print(f"📊 Planning mode: {'Segmented' if use_segmentation else 'Traditional'}")
+
+        initial_plan_result = await run_code_analyzer(
+            dir_info["paper_dir"], logger, use_segmentation=use_segmentation
+        )
         with open(initial_plan_path, "w", encoding="utf-8") as f:
             f.write(initial_plan_result)
         print(f"Initial plan saved to {initial_plan_path}")
@@ -1136,6 +1252,32 @@ async def execute_multi_agent_research_pipeline(
             download_result, logger, workspace_dir
         )
         await asyncio.sleep(30)
+
+        # Phase 3.5: Document Segmentation and Preprocessing
+
+        segmentation_result = await orchestrate_document_preprocessing_agent(
+            dir_info, logger
+        )
+
+        # Handle segmentation result
+        if segmentation_result["status"] == "success":
+            print("✅ Document preprocessing completed successfully!")
+            print(
+                f"   📊 Using segmentation: {dir_info.get('use_segmentation', False)}"
+            )
+            if dir_info.get("segments_ready", False):
+                print(
+                    f"   📁 Segments directory: {segmentation_result.get('segments_dir', 'N/A')}"
+                )
+        elif segmentation_result["status"] == "fallback_to_traditional":
+            print("⚠️ Document segmentation failed, using traditional processing")
+            print(
+                f"   Original error: {segmentation_result.get('original_error', 'Unknown')}"
+            )
+        else:
+            print(
+                f"⚠️ Document preprocessing encountered issues: {segmentation_result.get('error_message', 'Unknown')}"
+            )
 
         # Phase 4: Code Planning Orchestration
         await orchestrate_code_planning_agent(dir_info, logger, progress_callback)
