@@ -40,6 +40,8 @@ class CLIInterface:
         self.is_running = True
         self.processing_history = []
         self.enable_indexing = True  # Default configuration
+        self.segmentation_enabled = True  # Default to smart segmentation
+        self.segmentation_threshold = 50000  # Default threshold
 
         # Check tkinter availability for file dialogs
         self.tkinter_available = True
@@ -125,6 +127,9 @@ class CLIInterface:
         # Display current configuration
         pipeline_mode = "🧠 COMPREHENSIVE" if self.enable_indexing else "⚡ OPTIMIZED"
         index_status = "✅ Enabled" if self.enable_indexing else "🔶 Disabled"
+        segmentation_mode = (
+            "📄 SMART" if self.segmentation_enabled else "📋 TRADITIONAL"
+        )
 
         menu = f"""
 {Colors.BOLD}{Colors.CYAN}╔═══════════════════════════════════════════════════════════════════════════════╗
@@ -135,6 +140,7 @@ class CLIInterface:
 ║                                                                               ║
 ║  {Colors.BOLD}🤖 Current Pipeline Mode: {pipeline_mode}{Colors.CYAN}                          ║
 ║  {Colors.BOLD}🗂️  Codebase Indexing: {index_status}{Colors.CYAN}                                    ║
+║  {Colors.BOLD}📄 Document Processing: {segmentation_mode}{Colors.CYAN}                               ║
 ║                                                                               ║
 ║  {Colors.YELLOW}📝 URL Processing:{Colors.CYAN}                                                         ║
 ║  {Colors.YELLOW}   ▶ Enter research paper URL (arXiv, IEEE, ACM, etc.)                    {Colors.CYAN}║
@@ -693,6 +699,11 @@ class CLIInterface:
     def show_configuration_menu(self):
         """Show configuration options menu"""
         self.clear_screen()
+
+        # Get segmentation config status
+        segmentation_enabled = getattr(self, "segmentation_enabled", True)
+        segmentation_threshold = getattr(self, "segmentation_threshold", 50000)
+
         print(f"""
 {Colors.BOLD}{Colors.CYAN}╔═══════════════════════════════════════════════════════════════════════════════╗
 ║                           CONFIGURATION MENU                                  ║
@@ -716,9 +727,23 @@ class CLIInterface:
 ║         ✗ Repository Acquisition (Skipped)                                   ║
 ║         ✗ Codebase Intelligence Orchestration (Skipped)                     ║
 ║                                                                               ║
-║  {Colors.YELLOW}Current Setting:{Colors.CYAN} {'🧠 Comprehensive Mode' if self.enable_indexing else '⚡ Optimized Mode'}                              ║
+║  {Colors.OKCYAN}[2] Document Processing:{Colors.CYAN}                                                   ║
+║      {Colors.BOLD}📄 Smart Segmentation{Colors.CYAN} - Intelligent document analysis (Default)      ║
+║         ✓ Semantic boundary detection                                        ║
+║         ✓ Algorithm integrity preservation                                   ║
+║         ✓ Formula chain recognition                                          ║
+║         ✓ Adaptive character limits                                          ║
 ║                                                                               ║
-║  {Colors.OKGREEN}[T] Toggle Pipeline Mode    {Colors.CYAN}│  {Colors.FAIL}[B] Back to Main Menu{Colors.CYAN}            ║
+║      {Colors.BOLD}📋 Traditional Processing{Colors.CYAN} - Full document reading                       ║
+║         ✓ Complete document analysis                                         ║
+║         ✗ Smart segmentation (Disabled)                                      ║
+║                                                                               ║
+║  {Colors.YELLOW}Current Settings:{Colors.CYAN}                                                         ║
+║    Pipeline: {'🧠 Comprehensive Mode' if self.enable_indexing else '⚡ Optimized Mode'}                                          ║
+║    Document: {'📄 Smart Segmentation' if segmentation_enabled else '📋 Traditional Processing'}                                ║
+║    Threshold: {segmentation_threshold} characters                                    ║
+║                                                                               ║
+║  {Colors.OKGREEN}[T] Toggle Pipeline    {Colors.BLUE}[S] Toggle Segmentation    {Colors.FAIL}[B] Back{Colors.CYAN}     ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝{Colors.ENDC}
 """)
 
@@ -737,8 +762,25 @@ class CLIInterface:
                 self.show_configuration_menu()
                 return
 
+            elif choice in ["s", "segmentation"]:
+                current_state = getattr(self, "segmentation_enabled", True)
+                self.segmentation_enabled = not current_state
+                seg_mode = (
+                    "📄 Smart Segmentation"
+                    if self.segmentation_enabled
+                    else "📋 Traditional Processing"
+                )
+                self.print_status(
+                    f"Document processing switched to: {seg_mode}", "success"
+                )
+                time.sleep(1)
+                self.show_configuration_menu()
+                return
+
             elif choice in ["b", "back"]:
                 return
 
             else:
-                self.print_status("Invalid choice. Please enter 'T' or 'B'.", "warning")
+                self.print_status(
+                    "Invalid choice. Please enter 'T', 'S', or 'B'.", "warning"
+                )
