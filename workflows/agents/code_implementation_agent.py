@@ -967,8 +967,8 @@ class CodeImplementationAgent:
         # Simulate that at least one file has been implemented (to trigger optimization)
         self.files_implemented_count = 1
 
-        # Test with a file that should have a summary
-        test_file = "rice/config.py"
+        # Test with a generic config file that should have a summary
+        test_file = "config.py"
 
         print(f"📁 Testing automatic optimization for: {test_file}")
         print(f"📊 Files implemented count: {self.files_implemented_count}")
@@ -1020,13 +1020,13 @@ class CodeImplementationAgent:
         print("🔄 AUTOMATIC READ_FILE OPTIMIZATION TEST COMPLETE")
         print("=" * 80)
 
-    async def test_summary_optimization(self, test_file_path: str = "rice/config.py"):
+    async def test_summary_optimization(self, test_file_path: str = "config.py"):
         """
         Test the summary optimization functionality with a specific file
         测试特定文件的总结优化功能
 
         Args:
-            test_file_path: File path to test (default: rice/config.py which should be in summary)
+            test_file_path: File path to test (default: config.py which should be in summary)
         """
         if not self.mcp_agent:
             return False

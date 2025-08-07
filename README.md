@@ -315,6 +315,7 @@ DeepCode leverages the **Model Context Protocol (MCP)** standard to seamlessly i
 | **⚡ command-executor** | System Commands | Execute bash/shell commands for environment management |
 | **🧬 code-implementation** | Code Generation Hub | Comprehensive code reproduction with execution and testing |
 | **📚 code-reference-indexer** | Smart Code Search | Intelligent indexing and search of code repositories |
+| **📄 document-segmentation** | Smart Document Analysis | Intelligent document segmentation for large papers and technical documents |
 
 ##### 🔧 **Legacy Tool Functions** *(for reference)*
 
@@ -465,6 +466,11 @@ curl -O https://raw.githubusercontent.com/HKUDS/DeepCode/main/mcp_agent.secrets.
 # Edit mcp_agent.config.yaml to set your API keys:
 # - For Brave Search: Set BRAVE_API_KEY: "your_key_here" in brave.env section (line ~28)
 # - For Bocha-MCP: Set BOCHA_API_KEY: "your_key_here" in bocha-mcp.env section (line ~74)
+
+# 📄 Configure document segmentation (optional)
+# Edit mcp_agent.config.yaml to control document processing:
+# - enabled: true/false (whether to use intelligent document segmentation)
+# - size_threshold_chars: 50000 (document size threshold to trigger segmentation)
 ```
 
 #### 🔧 **Development Installation (From Source)**
@@ -496,6 +502,11 @@ uv pip install -r requirements.txt
 # Edit mcp_agent.config.yaml to set your API keys:
 # - For Brave Search: Set BRAVE_API_KEY: "your_key_here" in brave.env section (line ~28)
 # - For Bocha-MCP: Set BOCHA_API_KEY: "your_key_here" in bocha-mcp.env section (line ~74)
+
+# 📄 Configure document segmentation (optional)
+# Edit mcp_agent.config.yaml to control document processing:
+# - enabled: true/false (whether to use intelligent document segmentation)
+# - size_threshold_chars: 50000 (document size threshold to trigger segmentation)
 ```
 
 ##### 🐍 **Using Traditional pip**
@@ -517,6 +528,11 @@ pip install -r requirements.txt
 # Edit mcp_agent.config.yaml to set your API keys:
 # - For Brave Search: Set BRAVE_API_KEY: "your_key_here" in brave.env section (line ~28)
 # - For Bocha-MCP: Set BOCHA_API_KEY: "your_key_here" in bocha-mcp.env section (line ~74)
+
+# 📄 Configure document segmentation (optional)
+# Edit mcp_agent.config.yaml to control document processing:
+# - enabled: true/false (whether to use intelligent document segmentation)
+# - size_threshold_chars: 50000 (document size threshold to trigger segmentation)
 ```
 
 </details>
@@ -698,6 +714,14 @@ python cli/main_cli.py
 </table>
 
 
+
+### 🆕 **Recent Updates**
+
+#### 📄 **Smart Document Segmentation (v1.2.0)**
+- **Intelligent Processing**: Automatically handles large research papers and technical documents that exceed LLM token limits
+- **Configurable Control**: Toggle segmentation via configuration with size-based thresholds
+- **Semantic Analysis**: Advanced content understanding with algorithm, concept, and formula preservation
+- **Backward Compatibility**: Seamlessly falls back to traditional processing for smaller documents
 
 ### 🚀 **Coming Soon**
 

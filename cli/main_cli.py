@@ -94,15 +94,21 @@ def parse_arguments():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=f"""
 {Colors.BOLD}Examples:{Colors.ENDC}
-  {Colors.CYAN}python main_cli.py{Colors.ENDC}                    # Interactive mode
-  {Colors.CYAN}python main_cli.py --file paper.pdf{Colors.ENDC}     # Process file directly
-  {Colors.CYAN}python main_cli.py --url https://...{Colors.ENDC}    # Process URL directly
-  {Colors.CYAN}python main_cli.py --chat "Build a web app..."{Colors.ENDC} # Process chat requirements
-  {Colors.CYAN}python main_cli.py --optimized{Colors.ENDC}          # Use optimized mode
+  {Colors.CYAN}python main_cli.py{Colors.ENDC}                               # Interactive mode
+  {Colors.CYAN}python main_cli.py --file paper.pdf{Colors.ENDC}                # Process file directly
+  {Colors.CYAN}python main_cli.py --url https://...{Colors.ENDC}               # Process URL directly
+  {Colors.CYAN}python main_cli.py --chat "Build a web app..."{Colors.ENDC}     # Process chat requirements
+  {Colors.CYAN}python main_cli.py --optimized{Colors.ENDC}                     # Use optimized mode
+  {Colors.CYAN}python main_cli.py --disable-segmentation{Colors.ENDC}          # Disable document segmentation
+  {Colors.CYAN}python main_cli.py --segmentation-threshold 30000{Colors.ENDC}  # Custom segmentation threshold
 
 {Colors.BOLD}Pipeline Modes:{Colors.ENDC}
   {Colors.GREEN}Comprehensive{Colors.ENDC}: Full intelligence analysis with indexing
   {Colors.YELLOW}Optimized{Colors.ENDC}:     Fast processing without indexing
+
+{Colors.BOLD}Document Processing:{Colors.ENDC}
+  {Colors.BLUE}Smart Segmentation{Colors.ENDC}: Intelligent document segmentation for large papers
+  {Colors.MAGENTA}Supported Formats{Colors.ENDC}: PDF, DOCX, DOC, PPT, PPTX, XLS, XLSX, HTML, TXT, MD
         """,
     )
 
@@ -126,6 +132,19 @@ def parse_arguments():
         "-o",
         action="store_true",
         help="Use optimized mode (skip indexing for faster processing)",
+    )
+
+    parser.add_argument(
+        "--disable-segmentation",
+        action="store_true",
+        help="Disable intelligent document segmentation (use traditional full-document processing)",
+    )
+
+    parser.add_argument(
+        "--segmentation-threshold",
+        type=int,
+        default=50000,
+        help="Document size threshold (characters) to trigger segmentation (default: 50000)",
     )
 
     parser.add_argument(
@@ -205,6 +224,24 @@ async def main():
             print(
                 f"\n{Colors.GREEN}🧠 Comprehensive mode enabled - full intelligence analysis{Colors.ENDC}"
             )
+
+        # Configure document segmentation settings
+        if hasattr(args, "disable_segmentation") and args.disable_segmentation:
+            print(
+                f"\n{Colors.MAGENTA}📄 Document segmentation disabled - using traditional processing{Colors.ENDC}"
+            )
+            app.segmentation_config = {
+                "enabled": False,
+                "size_threshold_chars": args.segmentation_threshold,
+            }
+        else:
+            print(
+                f"\n{Colors.BLUE}📄 Smart document segmentation enabled (threshold: {args.segmentation_threshold} chars){Colors.ENDC}"
+            )
+            app.segmentation_config = {
+                "enabled": True,
+                "size_threshold_chars": args.segmentation_threshold,
+            }
 
         # 检查是否为直接处理模式
         if args.file or args.url or args.chat:
