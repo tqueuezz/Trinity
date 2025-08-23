@@ -16,6 +16,10 @@
 </tr>
 </table>
 
+<div align="center">
+<a href="https://trendshift.io/repositories/14665" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14665" alt="HKUDS%2FDeepCode | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+
 <!-- <img src="https://readme-typing-svg.herokuapp.com?font=Russo+One&size=28&duration=2000&pause=800&color=06B6D4&background=00000000&center=true&vCenter=true&width=800&height=50&lines=%E2%9A%A1+OPEN+AGENTIC+CODING+%E2%9A%A1" alt="DeepCode Tech Subtitle" style="margin-top: 5px; filter: drop-shadow(0 0 12px #06B6D4) drop-shadow(0 0 24px rgba(6,182,212,0.4));"/> -->
 
 # <img src="https://github.com/Zongwei9888/Experiment_Images/raw/43c585dca3d21b8e4b6390d835cdd34dc4b4b23d/DeepCode_images/title_logo.svg" alt="DeepCode Logo" width="32" height="32" style="vertical-align: middle; margin-right: 8px;"/> DeepCode: Open Agentic Coding
