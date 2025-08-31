@@ -96,7 +96,7 @@ mcp:
 openai:
   # Secrets (API keys, etc.) are stored in an mcp_agent.secrets.yaml file which can be gitignored
   #  default_model: "o3-mini"
-  default_model: "anthropic/claude-sonnet-4"
+  default_model: "anthropic/claude-3.5-sonnet"
 
 
 anthropic:

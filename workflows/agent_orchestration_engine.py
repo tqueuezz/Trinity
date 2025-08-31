@@ -661,6 +661,12 @@ async def orchestrate_document_preprocessing_agent(
         # Step 2: Read document content to determine size
         md_path = os.path.join(dir_info["paper_dir"], md_files[0])
         try:
+            # Check if file is actually a PDF by reading the first few bytes
+            with open(md_path, "rb") as f:
+                header = f.read(8)
+                if header.startswith(b'%PDF'):
+                    raise IOError(f"File {md_path} is a PDF file, not a text file. Please convert it to markdown format or use PDF processing tools.")
+            
             with open(md_path, "r", encoding="utf-8") as f:
                 document_content = f.read()
         except Exception as e:

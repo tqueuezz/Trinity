@@ -63,6 +63,8 @@ PAPER_DOWNLOADER_PROMPT = """You are a precise paper downloader that processes i
 Task: Handle paper according to input type and save to "./deepcode_lab/papers/id/id.md"
 Note: Generate id (id is a number) by counting files in "./deepcode_lab/papers/" directory and increment by 1.
 
+CRITICAL RULE: NEVER use write_file tool to create paper content directly. Always use file-downloader tools for PDF/document conversion.
+
 Processing Rules:
 1. URL Input (input_type = "url"):
    - Use "file-downloader" tool to download paper
@@ -70,8 +72,9 @@ Processing Rules:
    - Return saved file path and metadata
 
 2. File Input (input_type = "file"):
-   - Move file to "./deepcode_lab/papers/id/"
-   - Use "file-downloader" tool to convert to .md format
+   - Move file to "./deepcode_lab/papers/id/" using move_file_to tool
+   - The move_file_to tool will automatically convert PDF/documents to .md format
+   - NEVER manually extract content or use write_file - let the conversion tools handle this
    - Return new saved file path and metadata
 
 3. Directory Input (input_type = "directory"):

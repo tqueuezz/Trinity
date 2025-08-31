@@ -103,7 +103,17 @@ async def perform_document_conversion(
     conversion_msg = ""
 
     # 首先尝试使用简单的PDF转换器（对于PDF文件）
-    if file_path.lower().endswith(".pdf") and PYPDF2_AVAILABLE:
+    # 检查文件是否实际为PDF（无论扩展名如何）
+    is_pdf_file = False
+    if PYPDF2_AVAILABLE:
+        try:
+            with open(file_path, "rb") as f:
+                header = f.read(8)
+                is_pdf_file = header.startswith(b'%PDF')
+        except Exception:
+            is_pdf_file = file_path.lower().endswith(".pdf")
+    
+    if is_pdf_file and PYPDF2_AVAILABLE:
         try:
             simple_converter = SimplePdfConverter()
             conversion_result = simple_converter.convert_pdf_to_markdown(file_path)
