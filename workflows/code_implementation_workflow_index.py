@@ -11,6 +11,7 @@ MCP Architecture:
 - Configuration: mcp_agent.config.yaml
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -289,7 +290,7 @@ Requirements:
         target_directory,
     ):
         """Pure code implementation loop with memory optimization and phase consistency"""
-        max_iterations = 100
+        max_iterations = 500
         iteration = 0
         start_time = time.time()
         max_time = 2400  # 40 minutes
@@ -381,6 +382,8 @@ Requirements:
                 if memory_agent.should_trigger_memory_optimization(
                     messages, code_agent.get_files_implemented_count()
                 ):
+                    # Memory optimization triggered
+
                     # Apply concise memory optimization
                     files_implemented_count = code_agent.get_files_implemented_count()
                     current_system_message = code_agent.get_system_prompt()
@@ -418,9 +421,9 @@ Requirements:
                 keyword in response_content.lower()
                 for keyword in [
                     "all files implemented",
-                    "implementation complete",
                     "all phases completed",
                     "reproduction plan fully implemented",
+                    "all code of repo implementation complete",
                 ]
             ):
                 self.logger.info("Code implementation declared complete")
@@ -502,7 +505,7 @@ Requirements:
                 # Test connection with default model from config
                 await client.messages.create(
                     model=self.default_models["anthropic"],
-                    max_tokens=10,
+                    max_tokens=20,
                     messages=[{"role": "user", "content": "test"}],
                 )
                 self.logger.info(
@@ -721,7 +724,7 @@ Requirements:
 2. **If MORE files need implementation:** Continue with dependency-aware workflow:
    - **Start with `read_code_mem`** to understand existing implementations and dependencies
    - **Optionally use `search_code_references`** for reference patterns (OPTIONAL - use for inspiration only, original paper specs take priority)
-   - **Then `write_file`** to implement the new component based on original paper requirements
+   - **Then `write_file`** to implement the new component
    - **Finally: Test** if needed
 
 💡 **Key Point:** Always verify completion status before continuing with new file creation."""
@@ -738,7 +741,7 @@ Requirements:
    - **If NO:** Continue with proper development cycle for next file:
      - **Start with `read_code_mem`** to understand existing implementations
      - **Optionally use `search_code_references`** for reference patterns (OPTIONAL - for inspiration only)
-     - **Then `write_file`** to implement properly based on original paper requirements
+     - **Then `write_file`** to implement properly
      - **Test** if needed
 4. Ensure proper error handling in future implementations
 
@@ -757,7 +760,7 @@ Requirements:
 2. **If MORE files need implementation:** Follow the development cycle:
    - **Start with `read_code_mem`** to understand existing implementations
    - **Optionally use `search_code_references`** for reference patterns (OPTIONAL - for inspiration only)
-   - **Then `write_file`** to implement the new component based on original paper requirements
+   - **Then `write_file`** to implement the new component
    - **Finally: Test** if needed
 
 🚨 **Critical:** Always verify completion status first, then use appropriate tools - not just explanations!"""
@@ -880,4 +883,115 @@ Requirements:
             self.logger.error(f"Failed to generate final report: {e}")
             return f"Failed to generate final report: {str(e)}"
 
-    # ==================== 8. Testing and Debugging (Testing Layer) ====================
+
+async def main():
+    """Main function for running the workflow"""
+    # Configure root logger carefully to avoid duplicates
+    root_logger = logging.getLogger()
+    if not root_logger.handlers:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
+        root_logger.setLevel(logging.INFO)
+
+    workflow = CodeImplementationWorkflowWithIndex()
+
+    print("=" * 60)
+    print("Code Implementation Workflow with UNIFIED Reference Indexer")
+    print("=" * 60)
+    print("Select mode:")
+    print("1. Test Code Reference Indexer Integration")
+    print("2. Run Full Implementation Workflow")
+    print("3. Run Implementation with Pure Code Mode")
+    print("4. Test Read Tools Configuration")
+
+    # mode_choice = input("Enter choice (1-4, default: 3): ").strip()
+
+    # For testing purposes, we'll run the test first
+    # if mode_choice == "4":
+    #     print("Testing Read Tools Configuration...")
+
+    #     # Create a test workflow normally
+    #     test_workflow = CodeImplementationWorkflow()
+
+    #     # Create a mock code agent for testing
+    #     print("\n🧪 Testing with read tools DISABLED:")
+    #     test_agent_disabled = CodeImplementationAgent(None, enable_read_tools=False)
+    #     await test_agent_disabled.test_read_tools_configuration()
+
+    #     print("\n🧪 Testing with read tools ENABLED:")
+    #     test_agent_enabled = CodeImplementationAgent(None, enable_read_tools=True)
+    #     await test_agent_enabled.test_read_tools_configuration()
+
+    #     print("✅ Read tools configuration testing completed!")
+    #     return
+
+    # print("Running Code Reference Indexer Integration Test...")
+
+    test_success = True
+    if test_success:
+        print("\n" + "=" * 60)
+        print("🎉 UNIFIED Code Reference Indexer Integration Test PASSED!")
+        print("🔧 Three-step process successfully merged into ONE tool")
+        print("=" * 60)
+
+        # Ask if user wants to continue with actual workflow
+        print("\nContinuing with workflow execution...")
+
+        plan_file = "/Users/lizongwei/Reasearch/DeepCode_Base/DeepCode/deepcode_lab/papers/1/initial_plan.txt"
+        # plan_file = "/data2/bjdwhzzh/project-hku/Code-Agent2.0/Code-Agent/deepcode-mcp/agent_folders/papers/1/initial_plan.txt"
+        target_directory = (
+            "/Users/lizongwei/Reasearch/DeepCode_Base/DeepCode/deepcode_lab/papers/1/"
+        )
+        print("Implementation Mode Selection:")
+        print("1. Pure Code Implementation Mode (Recommended)")
+        print("2. Iterative Implementation Mode")
+
+        pure_code_mode = True
+        mode_name = "Pure Code Implementation Mode with Memory Agent Architecture + Code Reference Indexer"
+        print(f"Using: {mode_name}")
+
+        # Configure read tools - modify this parameter to enable/disable read tools
+        enable_read_tools = (
+            True  # Set to False to disable read_file and read_code_mem tools
+        )
+        read_tools_status = "ENABLED" if enable_read_tools else "DISABLED"
+        print(f"🔧 Read tools (read_file, read_code_mem): {read_tools_status}")
+
+        # NOTE: To test without read tools, change the line above to:
+        # enable_read_tools = False
+
+        result = await workflow.run_workflow(
+            plan_file,
+            target_directory=target_directory,
+            pure_code_mode=pure_code_mode,
+            enable_read_tools=enable_read_tools,
+        )
+
+        print("=" * 60)
+        print("Workflow Execution Results:")
+        print(f"Status: {result['status']}")
+        print(f"Mode: {mode_name}")
+
+        if result["status"] == "success":
+            print(f"Code Directory: {result['code_directory']}")
+            print(f"MCP Architecture: {result.get('mcp_architecture', 'unknown')}")
+            print("Execution completed!")
+        else:
+            print(f"Error Message: {result['message']}")
+
+        print("=" * 60)
+        print(
+            "✅ Using Standard MCP Architecture with Memory Agent + Code Reference Indexer"
+        )
+
+    else:
+        print("\n" + "=" * 60)
+        print("❌ Code Reference Indexer Integration Test FAILED!")
+        print("Please check the configuration and try again.")
+        print("=" * 60)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

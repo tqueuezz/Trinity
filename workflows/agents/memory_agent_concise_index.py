@@ -215,31 +215,49 @@ class ConciseMemoryAgent:
             if ":" in line and not ("." in line and "/" in line):
                 continue
 
-            # Only process lines that look like file tree structure
-            if not any(
-                char in line for char in ["├", "└", "│", "-"]
-            ) and not line.startswith("    "):
+            stripped_line = line.strip()
+
+            # Detect root directory (directory name ending with / at minimal indentation)
+            if (
+                stripped_line.endswith("/")
+                and len(line) - len(line.lstrip())
+                <= 4  # Minimal indentation (0-4 spaces)
+                and not any(char in line for char in ["├", "└", "│", "─"])
+            ):  # No tree characters
+                root_directory = stripped_line.rstrip("/")
+                path_stack = [root_directory]
                 continue
 
-            # Remove tree characters and get the clean name
+            # Only process lines that have tree structure
+            if not any(char in line for char in ["├", "└", "│", "─"]):
+                continue
+
+            # Parse tree structure depth by analyzing the line structure
+            # Count │ characters before the actual item, or use indentation as fallback
+            pipe_count = 0
+
+            for i, char in enumerate(line):
+                if char == "│":
+                    pipe_count += 1
+                elif char in ["├", "└"]:
+                    break
+
+            # Calculate depth: use pipe count if available, otherwise use indentation
+            if pipe_count > 0:
+                depth = pipe_count + 1  # +1 because the actual item is one level deeper
+            else:
+                # Use indentation to determine depth (every 4 spaces = 1 level)
+                indent_spaces = len(line) - len(line.lstrip())
+                depth = max(1, indent_spaces // 4)  # At least depth 1
+
+            # Clean the line to get the item name
             clean_line = line
-            for char in ["├──", "└──", "│", "─", "├", "└"]:
+            for char in ["├──", "└──", "├", "└", "│", "─"]:
                 clean_line = clean_line.replace(char, "")
             clean_line = clean_line.strip()
 
             if not clean_line or ":" in clean_line:
                 continue
-
-            # Calculate indentation level by counting spaces/tree chars
-            indent_level = 0
-            for char in line:
-                if char in [" ", "\t", "│", "├", "└", "─"]:
-                    indent_level += 1
-                else:
-                    break
-            indent_level = max(
-                0, (indent_level - 4) // 4
-            )  # Normalize to directory levels
 
             # Extract filename (remove comments)
             if "#" in clean_line:
@@ -251,12 +269,34 @@ class ConciseMemoryAgent:
             if not filename:
                 continue
 
-            # Update path stack based on indentation
-            if indent_level < len(path_stack):
-                path_stack = path_stack[:indent_level]
+            # Adjust path stack to current depth
+            while len(path_stack) < depth:
+                path_stack.append("")
+            path_stack = path_stack[:depth]
 
-            # If it's a directory (ends with / or no extension), add to path stack
-            if filename.endswith("/") or ("." not in filename and filename != ""):
+            # Determine if it's a directory or file
+            is_directory = (
+                filename.endswith("/")
+                or (
+                    "." not in filename
+                    and filename not in ["README", "requirements.txt", "setup.py"]
+                )
+                or filename
+                in [
+                    "core",
+                    "networks",
+                    "environments",
+                    "baselines",
+                    "evaluation",
+                    "experiments",
+                    "utils",
+                    "src",
+                    "lib",
+                    "app",
+                ]
+            )
+
+            if is_directory:
                 directory_name = filename.rstrip("/")
                 if directory_name and ":" not in directory_name:
                     path_stack.append(directory_name)
@@ -473,10 +513,16 @@ class ConciseMemoryAgent:
 
             # Format summary with only Implementation Progress and Dependencies for file saving
             file_summary_content = ""
-            if sections.get("implementation_progress"):
-                file_summary_content += sections["implementation_progress"] + "\n\n"
-            if sections.get("dependencies"):
-                file_summary_content += sections["dependencies"] + "\n\n"
+            if sections.get("core_purpose"):
+                file_summary_content += sections["core_purpose"] + "\n\n"
+            if sections.get("public_interface"):
+                file_summary_content += sections["public_interface"] + "\n\n"
+            if sections.get("internal_dependencies"):
+                file_summary_content += sections["internal_dependencies"] + "\n\n"
+            if sections.get("external_dependencies"):
+                file_summary_content += sections["external_dependencies"] + "\n\n"
+            if sections.get("implementation_notes"):
+                file_summary_content += sections["implementation_notes"] + "\n\n"
 
             # Create the formatted summary for file saving (without Next Steps)
             formatted_summary = self._format_code_implementation_summary(
@@ -545,12 +591,25 @@ class ConciseMemoryAgent:
 
 **Required Summary Format:**
 
-**Implementation Progress**: List the code file completed in current round and core implementation ideas
-  Format: {{file_path}}: {{core implementation ideas}}
+**Core Purpose** (provide a general overview of the file's main responsibility):
+- {{1-2 sentence description of file's main responsibility}}
 
-**Dependencies**: According to the File Structure and initial plan, list functions that may be called by other files
-  Format: {{file_path}}: Function {{function_name}}: core ideas--{{ideas}}; Required parameters--{{params}}; Return parameters--{{returns}}
-  Required packages: {{packages}}
+**Public Interface** (what other files can use, if any):
+- Class {{ClassName}}: {{purpose}} | Key methods: {{method_names}} | Constructor params: {{params}}
+- Function {{function_name}}({{params}}): {{purpose}} -> {{return_type}}: {{purpose}}
+- Constants/Types: {{name}}: {{value/description}}
+
+**Internal Dependencies** (what this file imports/requires, if any):
+- From {{module/file}}: {{specific_imports}}
+- External packages: {{package_name}} - {{usage_context}}
+
+**External Dependencies** (what depends on this file, if any):
+- Expected to be imported by: {{likely_consumer_files}}
+- Key exports used elsewhere: {{main_interfaces}}
+
+**Implementation Notes**: (if any)
+- Architecture decisions: {{key_choices_made}}
+- Cross-File Relationships: {{how_files_work_together}}
 
 **Next Steps**: List the code file (ONLY ONE) that will be implemented in the next round (MUST choose from "Remaining Unimplemented Files" above)
   Format: Code will be implemented: {{file_path}}
@@ -560,7 +619,6 @@ class ConciseMemoryAgent:
 - Be precise and concise
 - Focus on function interfaces that other files will need
 - Extract actual function signatures from the code
-- **CRITICAL: ONLY choose from the "Remaining Unimplemented Files" list above!**
 - **CRITICAL: For Next Steps, ONLY choose ONE file from the "Remaining Unimplemented Files" list above**
 - **NEVER suggest implementing a file that is already in the implemented files list**
 - Choose the next file based on logical dependencies and implementation order
@@ -570,6 +628,14 @@ class ConciseMemoryAgent:
 
         return prompt
 
+    # TODO: The prompt is not good, need to be improved
+    # **Implementation Progress**: List the code file completed in current round and core implementation ideas
+    #   Format: {{file_path}}: {{core implementation ideas}}
+
+    # **Dependencies**: According to the File Structure and initial plan, list functions that may be called by other files
+    #   Format: {{file_path}}: Function {{function_name}}: core ideas--{{ideas}}; Required parameters--{{params}}; Return parameters--{{returns}}
+    #   Required packages: {{packages}}
+
     def _extract_summary_sections(self, llm_summary: str) -> Dict[str, str]:
         """
         Extract different sections from LLM-generated summary
@@ -578,9 +644,17 @@ class ConciseMemoryAgent:
             llm_summary: Raw LLM-generated summary text
 
         Returns:
-            Dictionary with extracted sections: implementation_progress, dependencies, next_steps
+            Dictionary with extracted sections: core_purpose, public_interface, internal_dependencies,
+            external_dependencies, implementation_notes, next_steps
         """
-        sections = {"implementation_progress": "", "dependencies": "", "next_steps": ""}
+        sections = {
+            "core_purpose": "",
+            "public_interface": "",
+            "internal_dependencies": "",
+            "external_dependencies": "",
+            "implementation_notes": "",
+            "next_steps": "",
+        }
 
         try:
             lines = llm_summary.split("\n")
@@ -591,17 +665,30 @@ class ConciseMemoryAgent:
                 line_lower = line.lower().strip()
 
                 # Check for section headers
-                if "implementation progress" in line_lower:
+                if "core purpose" in line_lower:
                     if current_section and current_content:
                         sections[current_section] = "\n".join(current_content).strip()
-                    current_section = "implementation_progress"
+                    current_section = "core_purpose"
                     current_content = [line]  # Include the header
-                elif (
-                    "dependencies" in line_lower and "implementation" not in line_lower
-                ):
+                elif "public interface" in line_lower:
                     if current_section and current_content:
                         sections[current_section] = "\n".join(current_content).strip()
-                    current_section = "dependencies"
+                    current_section = "public_interface"
+                    current_content = [line]  # Include the header
+                elif "internal dependencies" in line_lower:
+                    if current_section and current_content:
+                        sections[current_section] = "\n".join(current_content).strip()
+                    current_section = "internal_dependencies"
+                    current_content = [line]  # Include the header
+                elif "external dependencies" in line_lower:
+                    if current_section and current_content:
+                        sections[current_section] = "\n".join(current_content).strip()
+                    current_section = "external_dependencies"
+                    current_content = [line]  # Include the header
+                elif "implementation notes" in line_lower:
+                    if current_section and current_content:
+                        sections[current_section] = "\n".join(current_content).strip()
+                    current_section = "implementation_notes"
                     current_content = [line]  # Include the header
                 elif "next steps" in line_lower:
                     if current_section and current_content:
@@ -621,8 +708,8 @@ class ConciseMemoryAgent:
 
         except Exception as e:
             self.logger.error(f"Failed to extract summary sections: {e}")
-            # Fallback: put everything in implementation_progress
-            sections["implementation_progress"] = llm_summary
+            # Fallback: put everything in core_purpose
+            sections["core_purpose"] = llm_summary
 
         return sections
 
@@ -642,6 +729,25 @@ class ConciseMemoryAgent:
         """
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        # # Create formatted list of implemented files
+        # implemented_files_list = (
+        #     "\n".join([f"- {file}" for file in self.implemented_files])
+        #     if self.implemented_files
+        #     else "- None yet"
+        # )
+
+        #         formatted_summary = f"""# Code Implementation Summary
+        # **All Previously Implemented Files:**
+        # {implemented_files_list}
+        # **Generated**: {timestamp}
+        # **File Implemented**: {file_path}
+        # **Total Files Implemented**: {files_implemented}
+
+        # {llm_summary}
+
+        # ---
+        # *Auto-generated by Memory Agent*
+        # """
         formatted_summary = f"""# Code Implementation Summary
 **Generated**: {timestamp}
 **File Implemented**: {file_path}
@@ -821,6 +927,7 @@ class ConciseMemoryAgent:
         if tool_name == "write_file":
             self.last_write_file_detected = True
             self.should_clear_memory_next = True
+
             # self.logger.info(f"🔄 WRITE_FILE DETECTED: {file_path} - Memory will be cleared in next round")
 
         # Only record specific tools that provide essential information
@@ -929,56 +1036,56 @@ class ConciseMemoryAgent:
             "role": "user",
             "content": f"""**Below is the Knowledge Base of the LATEST implemented code file:**
 {self._read_code_knowledge_base()}
-""",
+
+**Development Cycle - START HERE:**
+
+**For NEW file implementation:**
+1. **You need to call read_code_mem(already_implemented_file_path)** to understand existing implementations and dependencies - agent should choose relevant ALREADY IMPLEMENTED file paths for reference, NOT the new file you want to create
+2. `search_code_references` → OPTIONALLY search reference patterns for inspiration (use for reference only, original paper specs take priority)
+3. `write_file` → Create the complete code implementation based on original paper requirements
+4. `execute_python` or `execute_bash` → Test the partial implementation if needed
+
+**When all files implemented:**
+**Use execute_python or execute_bash** to test the complete implementation""",
         }
         concise_messages.append(knowledge_base_message)
 
         # 3. Add current tool results (essential information for next file generation)
         if self.current_round_tool_results:
             tool_results_content = self._format_tool_results()
+
+            # # Append Next Steps information if available
+            # if self.current_next_steps.strip():
+            #     tool_results_content += f"\n\n**Next Steps (from previous analysis):**\n{self.current_next_steps}"
+
             tool_results_message = {
                 "role": "user",
                 "content": f"""**Current Tool Results:**
-{tool_results_content}
-
-**🚨 NEXT STEP: First determine if ALL files from the reproduction plan have been implemented:**
-
-**If ALL files are implemented (reproduction plan complete):**
-- Use `execute_python` or `execute_bash` to test the complete implementation
-- If testing successful, respond with "**implementation complete**" to end the conversation
-- Only use `read_code_mem` if debugging is needed during testing
-
-**If MORE files need to be implemented:**
-- #1. `read_code_mem` → Query summaries of relevant **already-implemented** files (agent should choose which implemented file paths to reference)(important!!!)
-- #2. `search_code_references` → OPTIONALLY search reference patterns for inspiration (use for reference only, original paper specs take priority)
-- #3. `write_file` → Create the complete code implementation based on original paper requirements
-- #4. `execute_python` or `execute_bash` → Test the partial implementation if needed
-
-**Remember:** Always check if all planned files are implemented before continuing with new file creation.""",
+{tool_results_content}""",
             }
             concise_messages.append(tool_results_message)
         else:
             # If no tool results yet, add guidance for next steps
-            guidance_message = {
-                "role": "user",
-                "content": f"""**Current Round:** {self.current_round}
+            guidance_content = f"""**Current Round:** {self.current_round}
 
 **Development Cycle - START HERE:**
 
-**FIRST: Check if ALL files from the reproduction plan are implemented**
-- If YES: Use `execute_python` or `execute_bash` for testing, then respond "**implementation complete**"
-- If NO: Continue with file implementation cycle below
-
 **For NEW file implementation:**
-1. **You can call read_code_mem(*already_implemented_file_path*)** to understand existing implementations and dependencies - agent should choose relevant ALREADY IMPLEMENTED file paths for reference, NOT the new file you want to create
-2. **Optionally use search_code_references** for reference patterns (OPTIONAL - for inspiration only, original paper specs take priority)
-3. Write_file can be used to implement the new component based on original paper requirements
+1. **You need to call read_code_mem(already_implemented_file_path)** to understand existing implementations and dependencies - agent should choose relevant ALREADY IMPLEMENTED file paths for reference, NOT the new file you want to create
+2. `search_code_references` → OPTIONALLY search reference patterns for inspiration (use for reference only, original paper specs take priority)
+3. Write_file can be used to implement the new component
 4. Finally: Use execute_python or execute_bash for testing (if needed)
 
-**For TESTING/COMPLETION phase (when all files implemented):**
-1. **➡️ FIRST: Use execute_python or execute_bash** to test the complete implementation
-2. **If successful: Respond with "implementation complete"** to end the conversation
-3. Only use read_code_mem if debugging is needed during testing""",
+**When all files implemented:**
+1. **Use execute_python or execute_bash** to test the complete implementation"""
+
+            # # Append Next Steps information if available (even when no tool results)
+            # if self.current_next_steps.strip():
+            #     guidance_content += f"\n\n**Next Steps (from previous analysis):**\n{self.current_next_steps}"
+
+            guidance_message = {
+                "role": "user",
+                "content": guidance_content,
             }
             concise_messages.append(guidance_message)
         # **Available Essential Tools:** read_code_mem, write_file, execute_python, execute_bash
