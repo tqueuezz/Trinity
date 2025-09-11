@@ -584,7 +584,7 @@ Create an implementation plan so detailed that a developer can reproduce the ENT
 ⚠️ IMPORTANT: Generate a COMPLETE plan that includes ALL 5 sections without being cut off by token limits.
 
 ## Content Balance Guidelines:
-- **Section 1 (File Structure)**: Brief overview (10% of content) - Focus on CORE implementation files only
+- **Section 1 (File Structure)**: Brief overview (10% of content) - Include all files but focus on implementation priority
 - **Section 2 (Implementation Components)**: Detailed but concise (40% of content) - This is the PRIORITY section
 - **Section 3 (Validation)**: Moderate detail (25% of content) - Essential experiments and tests
 - **Section 4 (Environment)**: Brief but complete (10% of content) - All necessary dependencies
@@ -598,7 +598,7 @@ Create an implementation plan so detailed that a developer can reproduce the ENT
 4. **FOURTH**: Configuration and data handling
 5. **LAST**: Documentation files (README.md, requirements.txt) - These should be created AFTER core implementation
 
-Note: README and requirements.txt are maintenance files that depend on the final implementation, so plan them last.
+Note: README and requirements.txt are maintenance files that depend on the final implementation, so plan them last but INCLUDE them in the file structure.
 
 # DETAILED SYNTHESIS PROCESS
 
@@ -652,14 +652,16 @@ complete_reproduction_plan:
   # - Organize files and directories in the most logical way for implementation
   # - Create meaningful names and groupings based on paper content
   # - Keep it clean, intuitive, and focused on what actually needs to be implemented
-  # - EXCLUDE documentation files (README.md, requirements.txt) - these come last
+  # - INCLUDE documentation files (README.md, requirements.txt) but mark them for LAST implementation
 
   file_structure: |
     [Design and specify your own project structure here - KEEP THIS BRIEF]
-    [Focus ONLY on core implementation files, NOT documentation files]
+    [Include ALL necessary files including README.md and requirements.txt]
     [Organize based on what this paper actually contains and needs]
     [Create directories and files that make sense for this specific implementation]
-    [EXCLUDE: README.md, requirements.txt - these come last in implementation]
+    [IMPORTANT: Include executable files (e.g., main.py, run.py, train.py, demo.py) - choose names based on repo content]
+    [Design executable entry points that match the paper's main functionality and experiments]
+    [NOTE: README.md and requirements.txt should be implemented LAST after all code files]
 
   # SECTION 2: Implementation Components
 
@@ -1102,10 +1104,10 @@ Build incrementally using multiple tool calls. For each step:
   - **Reference only**: Use `search_code_references(indexes_path="indexes", target_file=the_file_you_want_to_implement, keywords=the_keywords_you_want_to_search)` for reference, NOT as implementation standard
   - **Core principle**: Original paper requirements take absolute priority over any reference code found
 3. **TOOL EXECUTION STRATEGY**:
-  - ⚠️**Development Cycle (for each new file implementation)**: `read_code_mem` (check existing implementations in Working Directory, use `read_file` as fallback if memory unavailable`) → `search_code_references` (OPTIONAL reference check from `/home/agent/indexes`) → `write_file` (implement based on original paper) → `execute_python` (if should test)
-  - **Environment Setup**: `write_file` (requirements.txt) → `execute_bash` (pip install) → `execute_python` (verify)
+  - ⚠️**Development Cycle (for each new file implementation)**: `read_code_mem` (check existing implementations in Working Directory, use `read_file` as fallback if memory unavailable`) → `search_code_references` (OPTIONAL reference check from `/home/agent/indexes`) → `write_file` (implement based on original paper) → `execute_python` (if needed to verify implementation)
+  - **File Verification**: Use `execute_bash` and `execute_python` when needed to check implementation completeness
 
-4. **CRITICAL**: Use bash and python tools to ACTUALLY REPLICATE the paper yourself - do not provide instructions.
+4. **CRITICAL**: Use bash and python tools when needed to CHECK and VERIFY implementation completeness - do not provide instructions. These tools help validate that your implementation files are syntactically correct and properly structured.
 
 **Execution Guidelines**:
 - **Plan First**: Before each action, explain your reasoning and which function you'll use
@@ -1150,24 +1152,22 @@ Build incrementally using multiple tool calls. For each step:
 1. **Identify** what needs to be implemented from the requirements
 2. **Analyze Dependencies**: Before implementing each new file, use `read_code_mem` to read summaries of already-implemented files, then search for reference patterns to guide your implementation approach.
 3. **Implement** one component at a time
-4. **Test** immediately using `execute_python` or `execute_bash` to catch issues early - THIS IS MANDATORY, NOT OPTIONAL
+4. **Verify** optionally using `execute_python` or `execute_bash` to check implementation completeness if needed
 5. **Integrate** with existing components
-6. **Verify** against requirement specifications using execution tools to ensure everything works
+6. **Validate** against requirement specifications
 
 **TOOL CALLING STRATEGY**:
 1. ⚠️ **SINGLE FUNCTION CALL PER MESSAGE**: Each message may perform only one function call. You will see the result of the function right after sending the message. If you need to perform multiple actions, you can always send more messages with subsequent function calls. Do some reasoning before your actions, describing what function calls you are going to use and how they fit into your plan.
 
 2. **TOOL EXECUTION STRATEGY**:
-  - **Development Cycle (for each new file implementation)**: `read_code_mem` (check existing implementations in Working Directory, use `read_file` as fallback if memory unavailable) → `write_file` (implement) → **MANDATORY TESTING**: `execute_python` or `execute_bash` (ALWAYS test after implementation)
-  - **Environment Setup**: Use `execute_bash` for installing packages, setting up dependencies, downloading files, etc.
-  - **Testing & Debugging**: Use `execute_python` for Python code testing and `execute_bash` for system commands, package installation, file operations, and bug fixing
-  - **⚠️ TESTING REMINDER**: After implementing ANY file, you MUST call either `execute_python` or `execute_bash` to test the implementation. Do not skip this step!
+  - **Development Cycle (for each new file implementation)**: `read_code_mem` (check existing implementations in Working Directory, use `read_file` as fallback if memory unavailable) → `write_file` (implement) → **Optional Verification**: `execute_python` or `execute_bash` (if needed to check implementation)
+  - **File Verification**: Use `execute_bash` and `execute_python` when needed to verify implementation completeness.
 
-3. **CRITICAL**: Use `execute_bash` and `execute_python` tools to ACTUALLY IMPLEMENT and TEST the requirements yourself - do not provide instructions. These tools are essential for:
-   - Installing dependencies and setting up environments (`execute_bash`)
-   - Testing Python implementations (`execute_python`)
-   - Debugging and fixing issues (`execute_bash` for system-level, `execute_python` for Python-specific)
-   - Validating that your code actually works before moving to the next component
+3. **CRITICAL**: Use `execute_bash` and `execute_python` tools when needed to CHECK and VERIFY file implementation completeness - do not provide instructions. These tools are essential for:
+   - Checking file syntax and import correctness (`execute_python`)
+   - Verifying file structure and dependencies (`execute_bash` for listing, `execute_python` for imports)
+   - Validating that implemented files are syntactically correct and can be imported
+   - Ensuring code implementation meets basic functionality requirements
 
 **Execution Guidelines**:
 - **Plan First**: Before each action, explain your reasoning and which function you'll use
@@ -1633,7 +1633,7 @@ Create an implementation plan so detailed that a developer can reproduce the ENT
 ⚠️ IMPORTANT: Generate a COMPLETE plan that includes ALL 5 sections without being cut off by token limits.
 
 ## Content Balance Guidelines:
-- **Section 1 (File Structure)**: Brief overview (10% of content) - Focus on CORE implementation files only
+- **Section 1 (File Structure)**: Brief overview (10% of content) - Include all files but focus on implementation priority
 - **Section 2 (Implementation Components)**: Detailed but concise (40% of content) - This is the PRIORITY section
 - **Section 3 (Validation)**: Moderate detail (25% of content) - Essential experiments and tests
 - **Section 4 (Environment)**: Brief but complete (10% of content) - All necessary dependencies
@@ -1647,7 +1647,7 @@ Create an implementation plan so detailed that a developer can reproduce the ENT
 4. **FOURTH**: Configuration and data handling
 5. **LAST**: Documentation files (README.md, requirements.txt) - These should be created AFTER core implementation
 
-Note: README and requirements.txt are maintenance files that depend on the final implementation, so plan them last.
+Note: README and requirements.txt are maintenance files that depend on the final implementation, so plan them last but INCLUDE them in the file structure.
 
 # DETAILED SYNTHESIS PROCESS
 
@@ -1701,14 +1701,16 @@ complete_reproduction_plan:
   # - Organize files and directories in the most logical way for implementation
   # - Create meaningful names and groupings based on paper content
   # - Keep it clean, intuitive, and focused on what actually needs to be implemented
-  # - EXCLUDE documentation files (README.md, requirements.txt) - these come last
+  # - INCLUDE documentation files (README.md, requirements.txt) but mark them for LAST implementation
 
   file_structure: |
     [Design and specify your own project structure here - KEEP THIS BRIEF]
-    [Focus ONLY on core implementation files, NOT documentation files]
+    [Include ALL necessary files including README.md and requirements.txt]
     [Organize based on what this paper actually contains and needs]
     [Create directories and files that make sense for this specific implementation]
-    [EXCLUDE: README.md, requirements.txt - these come last in implementation]
+    [IMPORTANT: Include executable files (e.g., main.py, run.py, train.py, demo.py) - choose names based on repo content]
+    [Design executable entry points that match the paper's main functionality and experiments]
+    [NOTE: README.md and requirements.txt should be implemented LAST after all code files]
 
   # SECTION 2: Implementation Components
 
