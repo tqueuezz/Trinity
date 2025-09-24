@@ -48,7 +48,6 @@ class CLIApp:
         """清理MCP应用 - 使用工作流适配器"""
         await self.workflow_adapter.cleanup_mcp_app()
 
-
     async def process_input(self, input_source: str, input_type: str):
         """处理输入源（URL或文件）- 使用升级版智能体编排引擎"""
         try:
