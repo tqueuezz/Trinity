@@ -8,5 +8,6 @@ mcp-server-git
 nest_asyncio
 pathlib2
 PyPDF2>=2.0.0
+pytest
 reportlab>=3.5.0
 streamlit
